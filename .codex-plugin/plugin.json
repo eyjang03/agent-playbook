@@ -1,0 +1,35 @@
+{
+  "name": "agent-playbook",
+  "version": "1.0.0",
+  "description": "Shared working rules, project notes, a Claude-Codex memory bridge, and a tools installer for Claude Code and Codex. Loads core rules and each project's handoff at the start of every session.",
+  "author": {
+    "name": "Eugene Jang"
+  },
+  "license": "MIT",
+  "keywords": [
+    "rules",
+    "agents-md",
+    "handoff",
+    "memory",
+    "setup"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks/codex-hooks.json",
+  "interface": {
+    "displayName": "Agent Playbook",
+    "shortDescription": "Shared rules, notes, and setup for AI agents",
+    "longDescription": "Shared working rules, project notes, a Claude-Codex memory bridge, and a tools installer for Claude Code and Codex. Loads core rules and each project's handoff at the start of every session. Includes skills to write your personal rules, tidy a project's notes, install recommended tools, and check a new AI model.",
+    "developerName": "Eugene Jang",
+    "category": "Productivity",
+    "capabilities": [
+      "Instructions",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Set up my rules.",
+      "Set up project notes for this project.",
+      "Install the playbook tools.",
+      "Run the new model check."
+    ]
+  }
+}

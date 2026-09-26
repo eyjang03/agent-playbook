@@ -1,0 +1,14 @@
+{
+  "name": "agent-playbook",
+  "owner": {
+    "name": "Eugene Jang"
+  },
+  "description": "Eugene's shared AI working setup for Claude Code and Codex.",
+  "plugins": [
+    {
+      "name": "agent-playbook",
+      "source": "./",
+      "description": "Shared working rules, project notes, a Claude-Codex memory bridge, and a tools installer for Claude Code and Codex. Loads core rules and each project's handoff at the start of every session."
+    }
+  ]
+}

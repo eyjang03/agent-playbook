@@ -1,0 +1,23 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/scripts/playbook.py\" start --app codex --part rules",
+            "timeout": 30,
+            "statusMessage": "Loading agent playbook",
+            "additionalContextLimit": 8000
+          },
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/scripts/playbook.py\" start --app codex --part context",
+            "timeout": 30,
+            "additionalContextLimit": 8000
+          }
+        ]
+      }
+    ]
+  }
+}

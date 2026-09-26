@@ -1,0 +1,17 @@
+{
+  "name": "agent-playbook",
+  "version": "1.0.0",
+  "description": "Shared working rules, project notes, a Claude-Codex memory bridge, and a tools installer for Claude Code and Codex. Loads core rules and each project's handoff at the start of every session.",
+  "author": {
+    "name": "Eugene Jang"
+  },
+  "license": "MIT",
+  "keywords": [
+    "rules",
+    "agents-md",
+    "handoff",
+    "memory",
+    "codex",
+    "setup"
+  ]
+}
