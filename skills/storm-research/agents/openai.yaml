@@ -1,0 +1,4 @@
+interface:
+  display_name: "Storm Research"
+  short_description: "Verified multi-perspective research briefings"
+  default_prompt: "Use $storm-research to build a citation-verified multi-perspective briefing on this topic."

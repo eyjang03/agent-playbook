@@ -15,6 +15,7 @@ A shared way of working for **Claude Code** and **Codex**: the same core rules i
 - *"Set up project notes"*: one `AGENTS.md` (merging any `CLAUDE.md` or `GEMINI.md`), a short `HANDOFF.md`, and a `LOG.md` only when the project needs one.
 - *"Install the playbook tools"*: installs the recommended skills and plugins in both apps, asking first.
 - *"Run the new model check"*: six everyday situations to see how a new AI model follows your rules.
+- *"Storm research this"*: a multi-perspective, citation-verified HTML research briefing (five expert lenses, a contradiction map, and primary-source checks).
 
 **It never** deletes, publishes, or changes account settings on its own; the rules tell the AI to ask first.
 
