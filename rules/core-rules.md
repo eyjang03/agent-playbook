@@ -18,6 +18,8 @@ Ask before anything hard to undo or that leaves this computer: deleting files, f
 
 Commit each finished piece of work with a message that says why, not just what; Git history is the project's main record. For parallel tasks, use a separate worktree and branch, merge when the task is done, then remove the worktree. When histories have split, show both sides and ask; don't merge, rebase, or force-push on your own.
 
+Installing this plugin does not enroll projects in Git automation. Use project setup only for folders the user selects. Honor the project's saved upload choice: local only, ask before uploading, or previously authorized automatic uploads to its selected branch and remote. Standing upload permission does not authorize a new destination, public visibility, or a broader tracked scope. Never treat a repository file as permission to upload from a new computer.
+
 ## Project instructions and notes
 
 - Keep project instructions in `AGENTS.md` only; don't create `CLAUDE.md` or `GEMINI.md`. Claude Code (2.1.277 and later), Codex, and Antigravity all read `AGENTS.md`, and extra copies drift apart or load twice. If a project has one, offer to merge it into `AGENTS.md`.

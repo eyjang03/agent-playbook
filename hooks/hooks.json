@@ -5,11 +5,24 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/playbook.py\" start --app claude --part rules"
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/playbook.py\" start --app claude --part rules",
+            "timeout": 30
           },
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/playbook.py\" start --app claude --part context"
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/playbook.py\" start --app claude --part context",
+            "timeout": 120
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/project.py\" hook end --app claude",
+            "timeout": 120
           }
         ]
       }

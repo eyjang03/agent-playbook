@@ -16,6 +16,8 @@ import re
 import subprocess
 import sys
 import tempfile
+import local_state
+import project as project_setup
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PART_LIMIT = 9000  # characters per hook output; each part stays well under the apps' limits
@@ -132,40 +134,44 @@ def context_part(app, cwd):
 # --- status ------------------------------------------------------------------
 
 def record(app, part, cwd, chars):
-    path = home(".agent-playbook", "status.json")
     try:
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        status = json.loads(read(path) or "{}")
-        status.setdefault(app, {})[part] = {
-            "last_run": datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
-            "folder": cwd, "characters": chars}
-        tmp = path + ".tmp"
-        with open(tmp, "w") as f:
-            json.dump(status, f, indent=2)
-        os.replace(tmp, path)
-    except (OSError, ValueError):
+        version = json.loads(read(os.path.join(ROOT, ".codex-plugin", "plugin.json")))["version"]
+        def save(status):
+            status.setdefault(app, {})[part] = {
+                "last_run": datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
+                "folder": cwd, "characters": chars, "version": version}
+        local_state.update("status.json", save)
+    except (OSError, ValueError, RuntimeError):
         pass
 
 
 def status():
-    data = json.loads(read(home(".agent-playbook", "status.json")) or "{}")
+    data = local_state.read("status.json")
     for app in ("claude", "codex"):
         runs = data.get(app, {})
         if not runs:
             print("%s: never ran on this computer (plugin not installed, or Codex hooks not approved yet)" % app)
         for part, info in sorted(runs.items()):
-            print("%s %s: last ran %s in %s (%s characters)" % (app, part, info["last_run"], info["folder"], info["characters"]))
-    for mode, info in sorted(data.get("project-sync", {}).items()):  # written by eugene-setup's sync hooks
+            print("%s %s: last ran %s in %s (%s characters; version %s)" % (app, part, info["last_run"], info["folder"], info["characters"], info.get("version", "not recorded")))
+    for mode, info in sorted(data.get("project-sync", {}).items()):  # compatibility with older sync hooks
         print("project-sync %s: last ran %s in %s" % (mode, info["last_run"], info["folder"]))
-    print("personal rules file: %s" % ("present" if read(home(".agent-playbook", "personal.md")) else "none (optional; not needed when a personal plugin such as eugene-setup supplies your rules)"))
+    print("personal rules file: %s" % ("present" if read(home(".agent-playbook", "personal.md")) else "none (optional if another source supplies your preferences)"))
     print("Codex memory summary: %s" % ("present" if read(home(".codex", "memories", "memory_summary.md")) else "none"))
+    choices = local_state.read(project_setup.REGISTRY)
+    print("project choices on this computer: %d (run scripts/project.py status for details)" % len(choices))
     return 0
 
 
 # --- entry points --------------------------------------------------------------
 
 def start(app, part, cwd):
-    text = rules_part() if part == "rules" else context_part(app, cwd)
+    if part == "rules":
+        text = rules_part()
+    else:
+        # Fetch before reading HANDOFF, even when the host runs separate hooks in parallel.
+        message = project_setup.run("start", cwd, app)
+        text = clip(("[agent-playbook project] " + message + "\n\n" if message else "") + context_part(app, cwd),
+                    "HANDOFF.md or the memory files")
     record(app, part, cwd, len(text))
     if not text:
         return {}
@@ -192,9 +198,13 @@ def main(argv):
 
 def selftest():
     tmp = tempfile.mkdtemp(prefix="playbook-test-")
-    old_home = os.environ.get("HOME")
-    os.environ["HOME"] = tmp
-    os.environ.update(GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t", GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@t")
+    from unittest.mock import patch
+    import shutil
+    patches = [patch(__name__ + ".home", lambda *parts: os.path.join(tmp, *parts)),
+               patch.object(local_state, "directory", lambda: project_setup.Path(tmp, ".agent-playbook")),
+               patch.dict(os.environ, dict(GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t", GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@t"))]
+    for mock in patches:
+        mock.start()
     try:
         project = os.path.join(tmp, "Documents", "My Project")
         os.makedirs(project)
@@ -246,9 +256,9 @@ def selftest():
         assert len(clip("x\n" * PART_LIMIT, "f")) <= PART_LIMIT + 80
         assert len(rules_part()) <= PART_LIMIT + 80
     finally:
-        if old_home is not None:
-            os.environ["HOME"] = old_home
-        subprocess.run(["rm", "-rf", tmp])
+        for mock in reversed(patches):
+            mock.stop()
+        shutil.rmtree(tmp)
     print("playbook self-test: all checks passed")
     return 0
 

@@ -1,7 +1,7 @@
 {
   "name": "agent-playbook",
-  "version": "1.1.1",
-  "description": "Shared working rules, project notes, a Claude-Codex memory bridge, and a tools installer for Claude Code and Codex. Loads core rules and each project's handoff at the start of every session.",
+  "version": "1.2.0",
+  "description": "Shared working rules, project notes, a Claude-Codex memory bridge, guided setup, and optional project Git sync for Claude Code and Codex.",
   "author": {
     "name": "Eugene Jang"
   },
@@ -18,7 +18,7 @@
   "interface": {
     "displayName": "Agent Playbook",
     "shortDescription": "Shared rules, notes, and setup for AI agents",
-    "longDescription": "Shared working rules, project notes, a Claude-Codex memory bridge, and a tools installer for Claude Code and Codex. Loads core rules and each project's handoff at the start of every session. Includes skills to write your personal rules, tidy a project's notes, install recommended tools, check a new AI model, and run STORM multi-perspective research.",
+    "longDescription": "Shared working rules, project notes, a Claude-Codex memory bridge, guided setup, and optional project Git sync for Claude Code and Codex. Choose personal preferences once per computer, select projects, and decide whether commits stay local, need approval to upload, or sync automatically.",
     "developerName": "Eugene Jang",
     "category": "Productivity",
     "capabilities": [
@@ -26,6 +26,8 @@
       "Write"
     ],
     "defaultPrompt": [
+      "Set up Agent Playbook on this computer.",
+      "Set up this project with Agent Playbook.",
       "Set up my rules.",
       "Set up project notes for this project.",
       "Install the playbook tools.",

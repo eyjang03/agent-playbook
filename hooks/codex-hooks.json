@@ -13,8 +13,19 @@
           {
             "type": "command",
             "command": "python3 \"${PLUGIN_ROOT}/scripts/playbook.py\" start --app codex --part context",
-            "timeout": 30,
+            "timeout": 120,
             "additionalContextLimit": 8000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/scripts/project.py\" hook end --app codex",
+            "timeout": 120
           }
         ]
       }

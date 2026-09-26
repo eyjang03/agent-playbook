@@ -12,6 +12,8 @@ The playbook loads two layers at the start of every session, in both apps:
 
 This skill writes layer 2.
 
+Both apps on the same computer use this one file. Set it up once and preserve any existing personal plugin's rules. Offer relevant habits from `docs/working-tips.md` in this plugin as optional examples, then record only the person's choices. Do not copy the author's accounts, devices, paths, or model preferences. Git upload permission belongs in the selected project's local setup, not in a blanket personal rule.
+
 ## Set up or update
 
 1. Read the core rules (`rules/core-rules.md` in this plugin's folder) and the current `~/.agent-playbook/personal.md` if it exists, so nothing gets duplicated or contradicted.
