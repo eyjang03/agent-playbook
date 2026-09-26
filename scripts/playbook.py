@@ -157,7 +157,7 @@ def status():
             print("%s %s: last ran %s in %s (%s characters)" % (app, part, info["last_run"], info["folder"], info["characters"]))
     for mode, info in sorted(data.get("project-sync", {}).items()):  # written by eugene-setup's sync hooks
         print("project-sync %s: last ran %s in %s" % (mode, info["last_run"], info["folder"]))
-    print("personal rules file: %s" % ("present" if read(home(".agent-playbook", "personal.md")) else "none (~/.agent-playbook/personal.md)"))
+    print("personal rules file: %s" % ("present" if read(home(".agent-playbook", "personal.md")) else "none (optional; not needed when a personal plugin such as eugene-setup supplies your rules)"))
     print("Codex memory summary: %s" % ("present" if read(home(".codex", "memories", "memory_summary.md")) else "none"))
     return 0
 
