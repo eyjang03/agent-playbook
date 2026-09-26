@@ -21,7 +21,7 @@ A shared way of working for **Claude Code** and **Codex**: the same core rules i
 
 ## Install
 
-You need access to this private repository (ask Eugene for an invite) and to be signed in to GitHub (`gh auth login`).
+This repository is public, so you can install the plugin without an invitation. Your personal rules stay on your computer in `~/.agent-playbook/personal.md`; they are not included here. Eugene's `eugene-setup` plugin is separate and is not required.
 
 **Claude Code** (2.1.277 or later)
 ```
