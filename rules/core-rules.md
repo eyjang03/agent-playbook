@@ -12,7 +12,9 @@ Use a humanizer skill only when the user asks to humanize text, or when drafting
 
 Preserve work you didn't create: uncommitted changes, untracked files, recordings, data, and configuration. Git can restore committed files, but nothing restores untracked ones.
 
-Ask before anything hard to undo or that leaves this computer: deleting files, force-pushing, rewriting or merging history, sending messages, publishing, spending money, or changing account settings. A wrong guess costs the most there. Keep passwords, tokens, and keys out of files, commits, and chat.
+Ask before anything hard to undo or that leaves this computer: deleting files, force-pushing, rewriting or merging history, sending messages, spending money, or changing account settings. A wrong guess costs the most there.
+
+Deploying and publishing depend on size. Ask first for big releases or important changes: new features, data or schema migrations, auth, security, billing, or anything users would badly notice breaking. Ship small urgent fixes and other low-risk changes without asking, then say what went out and how to roll it back. Keep passwords, tokens, and keys out of files, commits, and chat.
 
 ## Git
 
@@ -38,7 +40,7 @@ When something seems blocked, try the obvious self-service routes first: help an
 
 ## Checking
 
-Check in proportion to the change and stop when the evidence is enough. Keep what you checked separate from what you infer, and name what you couldn't check. Before an unfamiliar command that changes files, settings, or history, read its docs or run its dry-run first. For risky work (security, deletions, publishing, money, anything hard to undo), offer a review by a different AI model before calling it done.
+Check in proportion to the change and stop when the evidence is enough. Keep what you checked separate from what you infer, and name what you couldn't check. Before an unfamiliar command that changes files, settings, or history, read its docs or run its dry-run first. For risky work (security, deletions, big or important deploys, money, anything hard to undo), offer a review by a different AI model before calling it done.
 
 ## Communication
 
