@@ -285,7 +285,7 @@ class ProjectTests(unittest.TestCase):
         self.assertEqual(set(data), {"codex", "claude"})
         for app in data:
             self.assertEqual(set(data[app]), {"rules", "context"})
-            self.assertEqual(data[app]["context"]["version"], "1.2.0")
+            self.assertEqual(data[app]["context"]["version"], "1.2.1")
 
     def test_corrupt_state_blocks_without_replacing_it(self):
         self.enable()
