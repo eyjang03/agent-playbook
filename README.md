@@ -16,7 +16,7 @@ A shared way of working for **Claude Code** and **Codex**: core rules, project n
 - *"Set up my rules"*: writes your personal rules file after a few questions.
 - *"Set up project notes"*: one `AGENTS.md` (merging any `CLAUDE.md` or `GEMINI.md`), a short `HANDOFF.md`, and a `LOG.md` only when the project needs one.
 - *"Install the playbook tools"*: installs the recommended skills and plugins in both apps, asking first.
-- *"Run the new model check"*: ten everyday situations to see how a new AI model follows your rules.
+- *"Run the new model check"*: twelve everyday situations to see how a new AI model follows your rules.
 - *"Storm research this"*: a multi-perspective, citation-verified HTML research briefing (five expert lenses, a contradiction map, and primary-source checks).
 
 The core rules guide the agent; they are not a technical gate on every tool call. The plugin does not intercept deployments or outgoing messages. Its Git helper enforces its own saved sync choices. Use the host app and service permissions when an action must be technically blocked.
