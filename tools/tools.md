@@ -10,9 +10,8 @@ Install per app, only what the user wants. Check first; skip anything already pr
 | **hyperframes** (about 18 video skills) | Making videos, captions, and motion graphics from HTML | `npx skills add heygen-com/hyperframes -g` | same install (Codex reads `~/.agents/skills`) | `~/.agents/skills/hyperframes` |
 | **frontend-design** | Distinctive visual design for web UI | `npx skills add anthropics/skills --skill frontend-design -g` | add `-a codex` to the same command | `~/.agents/skills/frontend-design` |
 | **web-design-guidelines** | Reviewing UI against web interface guidelines | `npx skills add vercel-labs/agent-skills --skill web-design-guidelines -g` | add `-a codex` to the same command | `~/.agents/skills/web-design-guidelines` |
-| **notebooklm** | Google NotebookLM from the command line (notebooks, sources, podcasts) | `uv tool install "notebooklm-py[browser]"`, then `notebooklm skill install`, then the user runs `notebooklm login` | same CLI; the skill lands in `~/.agents/skills` | `notebooklm --version`; `~/.agents/skills/notebooklm` |
 
 Notes:
-- `npx` needs Node.js; `uv` needs `brew install uv` or the installer at astral.sh. Ask before installing either.
-- Signing in (NotebookLM, GitHub) is always done by the user.
+- `npx` needs Node.js. Ask before installing it.
+- Signing in to GitHub is done by the user.
 - Plugins installed from GitHub update through each app's plugin manager; `npx skills` installs update with `npx skills update`.
