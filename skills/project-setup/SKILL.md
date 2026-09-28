@@ -15,7 +15,7 @@ Ask for the choices that are still missing:
 
 - **Local Git only:** commits stay on this computer; no automatic network operations.
 - **Ask before uploading:** use a Git remote, but ask before each upload unless the user already authorized that specific upload in the current task. Hooks do no network operations.
-- **Automatic uploads:** every commit on the selected branch may be uploaded at session start and at the end of a reply, including commits made by the other app or by the person. This is standing permission for that destination and branch, not permission to publish elsewhere or change visibility.
+- **Automatic uploads:** every commit on the selected branch may be uploaded at session start, including commits made by the other app or by the person. This is standing permission for that destination and branch, not permission to publish elsewhere or change visibility.
 - For automatic uploads, separately offer **fast-forward downloads at session start** if they want work to travel between computers. Explain that split history needs a decision and that this is session-based sync, not a background file backup.
 
 Recommend local Git or ask-before-upload until they are comfortable with the scope. Automatic uploads with downloads match the author's multi-computer workflow, but remain optional. Select the actual default branch from repository evidence; never assume it is `main`. Keep an existing team branching workflow.
@@ -50,4 +50,4 @@ Use `project-notes` to agree on `AGENTS.md` and a short `HANDOFF.md`. Add only u
 
 ## Verify
 
-Run `python3 scripts/project.py status`. For automatic mode, verify a fresh session-start and end-of-reply run from each app they use in this project. A manual `hook` invocation can test sync after approval, but is not proof of app integration. Finish any authorized independent setup while app approval or another computer's check is pending. Never claim the second computer has downloaded work without checking it there.
+Run `python3 scripts/project.py status`. For automatic mode, verify a fresh session-start run from each app they use in this project. A manual `hook` invocation can test sync after approval, but is not proof of app integration. Finish any authorized independent setup while app approval or another computer's check is pending. Never claim the second computer has downloaded work without checking it there.

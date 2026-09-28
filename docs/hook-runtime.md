@@ -6,6 +6,11 @@ directory. The next stop hook failed before any Playbook code could run, and the
 host repeatedly returned the error to the chat. Both hook manifests used this
 pattern, so the fix covers both apps.
 
+Since 1.2.3 there is no Stop hook at all. Python exits with code 2 when its
+script is missing, and both hosts treat exit 2 from a Stop hook as "keep going",
+so one stale path became an endless loop that used up a whole usage allowance.
+Enrolled projects now upload pending commits at the next session start.
+
 ## Runtime carried by the command
 
 `scripts/build_hooks.py` generates both hook manifests. Each command contains a
@@ -62,7 +67,7 @@ The guarantee covers missing or replaced plugin cache files. It does not cover
 an unavailable Python installation, exhausted temporary storage, forced process
 termination, or host changes to hook protocols or command-size limits. Runtime
 startup failures produce an explicit warning with a successful process exit so
-the host does not retry a failing stop command. They are never recorded as a
+the host does not retry a failing hook. They are never recorded as a
 successful rules/context run. Existing project-sync failures retain their own
 status and messages. A host that refuses to execute a hook still requires action
 in that host.

@@ -1,6 +1,6 @@
 {
   "name": "agent-playbook",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Shared working rules, project notes, a Claude-Codex memory bridge, guided setup, and optional project Git sync for Claude Code and Codex.",
   "author": {
     "name": "Eugene Jang"

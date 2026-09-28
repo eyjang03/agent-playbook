@@ -56,7 +56,7 @@ Ask *"Set up this project with Agent Playbook"* from a folder you want to use. T
 |---|---|
 | Local Git only | No network operations; commits stay on this computer. |
 | Ask before uploading | No network operations; the AI requests any missing approval for a manual upload. |
-| Automatic uploads | Check the selected remote and upload pending commits at session start and the end of a reply. |
+| Automatic uploads | Check the selected remote and upload pending commits at session start. |
 | Automatic uploads + downloads | Also download newer commits at session start when a fast-forward can preserve local work. |
 
 Choices are saved locally in `~/.agent-playbook/projects.json`. They apply to both apps on this computer. A cloned repository, project instruction file, or another computer's setup cannot turn on uploads here. General rules and the memory bridge still load globally wherever the plugin is enabled.

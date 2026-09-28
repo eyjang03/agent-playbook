@@ -38,8 +38,7 @@ class HookUpdateTests(unittest.TestCase):
         for app, name in (("codex", "codex-hooks.json"), ("claude", "hooks.json")):
             doc = json.loads((self.cache / "hooks" / name).read_text())["hooks"]
             self.commands[app] = {"rules": doc["SessionStart"][0]["hooks"][0]["command"],
-                                  "context": doc["SessionStart"][0]["hooks"][1]["command"],
-                                  "stop": doc["Stop"][0]["hooks"][0]["command"]}
+                                  "context": doc["SessionStart"][0]["hooks"][1]["command"]}
 
     def run_hook(self, app, action, command=None, payload=None):
         result = subprocess.run(["/bin/sh", "-c", command or self.commands[app][action]],
@@ -75,7 +74,7 @@ class HookUpdateTests(unittest.TestCase):
             self.assertIn("Agent Playbook core rules", context)
             self.assertIn("Personal fixture preference", context)
             status = json.loads((self.state / "status.json").read_text())
-            self.assertEqual(status[app]["rules"]["version"], "1.2.2")
+            self.assertEqual(status[app]["rules"]["version"], json.loads((ROOT / ".codex-plugin/plugin.json").read_text())["version"])
         self.assertFalse(list(self.tmp.glob("agent-playbook-hook-*")))
 
     def test_cache_deletion_does_not_skip_handoff_or_memory_bridge(self):
@@ -103,11 +102,10 @@ class HookUpdateTests(unittest.TestCase):
         for app in self.commands:
             self.assertIn("Agent Playbook core rules", self.run_hook(app, "rules")["hookSpecificOutput"]["additionalContext"])
 
-    def test_unenrolled_stop_is_quiet_even_without_cache(self):
-        shutil.rmtree(self.cache)
-        for app in self.commands:
-            self.assertEqual(self.run_hook(app, "stop"), {})
-        self.assertFalse((self.state / "project-status.json").exists())
+    def test_no_stop_hook(self):
+        # A failing Stop hook is retried by the host every turn; see build_hooks.py.
+        for name in ("codex-hooks.json", "hooks.json"):
+            self.assertEqual(set(json.loads((ROOT / "hooks" / name).read_text())["hooks"]), {"SessionStart"})
 
     def test_enrolled_hooks_upload_and_download_after_cache_deletion(self):
         remote = self.root / "remote.git"
@@ -122,7 +120,7 @@ class HookUpdateTests(unittest.TestCase):
         shutil.rmtree(self.cache)
         for app in self.commands:
             self.commit(app + ".txt", app)
-            self.run_hook(app, "stop")
+            self.run_hook(app, "context")
             self.assertEqual(self.git(remote, "rev-parse", "main"), self.git(self.work, "rev-parse", "HEAD"))
             peer = self.root / (app + "-peer")
             self.git(self.root, "clone", "-q", str(remote), str(peer))
@@ -136,7 +134,7 @@ class HookUpdateTests(unittest.TestCase):
 
     def test_concurrent_hooks_use_separate_runtime_directories(self):
         shutil.rmtree(self.cache)
-        actions = [(app, action) for app in self.commands for action in ("rules", "context", "stop")]
+        actions = [(app, action) for app in self.commands for action in ("rules", "context")]
         with ThreadPoolExecutor(max_workers=6) as pool:
             list(pool.map(lambda pair: self.run_hook(*pair), actions))
         status = json.loads((self.state / "status.json").read_text())
@@ -153,13 +151,12 @@ class HookUpdateTests(unittest.TestCase):
 
     def test_corrupt_runtime_warns_without_retry_exit_code(self):
         for app in self.commands:
-            for action in ("rules", "context", "stop"):
+            for action in ("rules", "context"):
                 args = shlex.split(self.commands[app][action])
                 args[3] = args[3].replace('ARCHIVE_SHA256 = "', 'ARCHIVE_SHA256 = "invalid')
                 out = self.run_hook(app, action, command=shlex.join(args))
                 self.assertIn("did not complete", out["systemMessage"])
-                if action != "stop":
-                    self.assertIn("hookSpecificOutput", out)
+                self.assertIn("hookSpecificOutput", out)
         self.assertFalse((self.state / "status.json").exists())
 
     def test_zsh_can_run_the_saved_command_after_cache_deletion(self):

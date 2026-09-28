@@ -39,13 +39,15 @@ def documents(root=ROOT):
             if len(command.encode("utf-8")) > MAX_COMMAND_BYTES:
                 raise ValueError("Hook command exceeds the tested size budget")
             item = {"type": "command", "command": command, "timeout": 30 if action == "rules" else 120}
-            if app == "codex" and action != "stop":
+            if app == "codex":
                 item["additionalContextLimit"] = 8000
                 if action == "rules":
                     item["statusMessage"] = "Loading agent playbook"
             return item
-        doc = {"hooks": {"SessionStart": [{"hooks": [hook("rules"), hook("context")]}],
-                         "Stop": [{"hooks": [hook("stop")]}]}}
+        # ponytail: no Stop hook. A host retries a failing Stop hook every turn, which
+        # burned a whole usage allowance when an old session kept a deleted path.
+        # Enrolled projects upload at the next session start instead.
+        doc = {"hooks": {"SessionStart": [{"hooks": [hook("rules"), hook("context")]}]}}
         outputs[root / "hooks" / filename] = json.dumps(doc, indent=2) + "\n"
     return outputs
 

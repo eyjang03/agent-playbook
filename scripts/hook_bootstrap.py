@@ -35,7 +35,7 @@ def failure(app, action):
 def main():
     app, action = (sys.argv[1:] + ["", ""])[:2]
     try:
-        if len(sys.argv) != 3 or app not in ("codex", "claude") or action not in ("rules", "context", "stop"):
+        if len(sys.argv) != 3 or app not in ("codex", "claude") or action not in ("rules", "context"):
             raise ValueError("Invalid hook arguments")
         archive = base64.b64decode(ARCHIVE_B64, validate=True)
         if hashlib.sha256(archive).hexdigest() != ARCHIVE_SHA256:
@@ -53,16 +53,13 @@ def main():
                     target.write_bytes(bundle.read(name))
             scripts = root / "scripts"
             sys.path.insert(0, str(scripts))
-            if action == "stop":
-                sys.argv = [str(scripts / "project.py"), "hook", "end", "--app", app]
-            else:
-                sys.argv = [str(scripts / "playbook.py"), "start", "--app", app, "--part", action]
+            sys.argv = [str(scripts / "playbook.py"), "start", "--app", app, "--part", action]
             runpy.run_path(sys.argv[0], run_name="__main__")
     except SystemExit as exc:
         if exc.code not in (None, 0):
             failure(app, action)
     except Exception:
-        # Keep exceptions/paths out of the feedback and do not trigger stop retries.
+        # Keep exceptions/paths out of the feedback and exit 0 so the host does not retry.
         # A warning is deliberately different from a successful empty hook result.
         failure(app, action)
 
