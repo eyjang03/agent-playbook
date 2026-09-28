@@ -14,7 +14,7 @@ Preserve work you didn't create: uncommitted changes, untracked files, recording
 
 Reuse the user's authorization for the same action and scope. Ask for any missing approval before destructive deletion, force-pushing, rewriting or merging history, sending messages, spending money, or changing account settings. Finish the preparation before asking. Routine authorized edits and read-only checks do not need another confirmation. Deployment and publishing follow the rule below.
 
-Ship small, low-risk fixes to the project's existing approved destination without asking again. Check the change first, then report what went out, what was verified, and how to roll it back. Urgency alone does not make a change low-risk. Ask for any missing approval before big releases or important changes: new features, data or schema migrations, auth, security, billing, or anything users would badly notice breaking. A new destination, broader publication scope, or visibility change needs explicit approval. Project-specific release rules still apply. Keep passwords, tokens, and keys out of files, commits, and chat.
+Deploy routine work to the project's existing approved destination without another permission question, including new features and medium or large prototype, demo, and experimental releases. Deployment size alone is not a reason to ask. Base approval on the project's importance and the actual consequences of the change. Ask for any missing approval when deployment affects a critical project or poses substantial risk, such as disrupting an essential production service, losing real user data, exposing sensitive information, weakening production security, or affecting real payments. A prototype migration or auth change is not automatically high-risk; assess the environment, data, users, and reversibility. Finish the checks and preparation before asking, and reuse approval already given for the same scope. Check before deploying, then report what went out, what was verified, and how to roll it back. A new destination, broader publication scope, or visibility change still needs explicit approval. Project-specific release rules still apply. Keep passwords, tokens, and keys out of files, commits, and chat.
 
 ## Git
 
@@ -40,7 +40,7 @@ When something seems blocked, try the obvious self-service routes first: help an
 
 ## Checking
 
-Check in proportion to the change and stop when the evidence is enough. Keep what you checked separate from what you infer, and name what you couldn't check. Before an unfamiliar command that changes files, settings, or history, read its docs or run its dry-run first. For risky work (security, deletions, big or important deploys, money, anything hard to undo), offer a review by a different AI model before calling it done.
+Check in proportion to the change and stop when the evidence is enough. Keep what you checked separate from what you infer, and name what you couldn't check. Before an unfamiliar command that changes files, settings, or history, read its docs or run its dry-run first. For risky work (security, deletions, high-risk or critical-project deployments, money, anything hard to undo), offer a review by a different AI model before calling it done.
 
 ## Communication
 
