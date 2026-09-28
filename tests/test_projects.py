@@ -285,7 +285,8 @@ class ProjectTests(unittest.TestCase):
         self.assertEqual(set(data), {"codex", "claude"})
         for app in data:
             self.assertEqual(set(data[app]), {"rules", "context"})
-            self.assertEqual(data[app]["context"]["version"], "1.2.1")
+            manifest = Path(playbook.ROOT, ".codex-plugin", "plugin.json")
+            self.assertEqual(data[app]["context"]["version"], json.loads(manifest.read_text())["version"])
 
     def test_corrupt_state_blocks_without_replacing_it(self):
         self.enable()

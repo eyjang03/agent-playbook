@@ -74,6 +74,7 @@ Run these from the installed plugin folder:
 ```
 python3 scripts/playbook.py status     # when the hooks last ran, in each app
 python3 scripts/playbook.py test       # self-test
+python3 scripts/build_hooks.py --check # generated hooks match their runtime sources
 python3 scripts/project.py status     # this computer's project choices and sync results
 python3 -m unittest discover -s tests  # isolated Git tests, no GitHub account needed
 ```
@@ -83,6 +84,12 @@ After installation or an update, start a new session in each app. Check for fres
 The helpers normally use `~/.agent-playbook`. `AGENT_PLAYBOOK_HOME` can isolate project choices and status during development or testing; the personal rules file remains at its usual path.
 
 ## Update
+
+Version 1.2.2 makes hooks independent of the installed plugin directory. An active
+chat can keep running its original hook runtime after an update removes that
+directory. When upgrading from 1.2.1 or earlier, reload existing sessions once;
+their already-loaded commands cannot be replaced by a plugin update. See
+[hook runtime and verification](docs/hook-runtime.md) for the design and limits.
 
 Update each app separately. Refreshing the marketplace alone is not the same as updating the installed plugin.
 
