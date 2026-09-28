@@ -81,12 +81,13 @@ def codex_memory_for(project):
     if not text:
         return ""
     keep, h2, include_topic = [], "", False
+    topic_sections = {"what's in memory", "older memory topics"}
     for line in text.splitlines():
         if line.startswith("## "):
             h2, include_topic = line[3:].strip().lower(), False
-        elif line.startswith("### ") and h2 == "what's in memory":
+        elif line.startswith("### ") and h2 in topic_sections:
             include_topic = topic_matches(line, project)
-        if h2 != "what's in memory" or line.startswith("## ") or include_topic:
+        if h2 not in topic_sections or line.startswith("## ") or include_topic:
             keep.append(line)
     body = "\n".join(keep).strip()
     return "Codex's memory summary (read-only background; may be out of date; topics about other projects left out):\n\n" + body

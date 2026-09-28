@@ -6,19 +6,19 @@ These rules come from the agent-playbook plugin and apply in every project. A pr
 
 Don't use em dashes in prose; use commas, parentheses, colons, or ordinary hyphens.
 
-Use a humanizer skill only when the user asks to humanize text, or when drafting or editing something they will send, submit, publish, present, or teach from. Use `humanizer` for English and `humanize-korean` for Korean, each on its own language in mixed text. Skip it for conversation, explanations, plans, status updates, and help with homework or practice questions. Keep meaning, facts, names, numbers, quotes, links, and formatting; never humanize code or wording that must stay verbatim. Don't mention the pass unless asked.
+When the relevant skill is available, use a humanizer skill only when the user asks to humanize text, or when drafting or editing something they will send, submit, publish, present, or teach from. Use `humanizer` for English and `humanize-korean` for Korean, each on its own language in mixed text. Skip it for conversation, explanations, plans, status updates, and help with homework or practice questions. Keep meaning, facts, names, numbers, quotes, links, and formatting; never humanize code or wording that must stay verbatim. Don't mention the pass unless asked.
 
 ## Protecting work
 
 Preserve work you didn't create: uncommitted changes, untracked files, recordings, data, and configuration. Git can restore committed files, but nothing restores untracked ones.
 
-Ask before anything hard to undo or that leaves this computer: deleting files, force-pushing, rewriting or merging history, sending messages, spending money, or changing account settings. A wrong guess costs the most there.
+Reuse the user's authorization for the same action and scope. Ask for any missing approval before destructive deletion, force-pushing, rewriting or merging history, sending messages, spending money, or changing account settings. Finish the preparation before asking. Routine authorized edits and read-only checks do not need another confirmation. Deployment and publishing follow the rule below.
 
-Deploying and publishing depend on size. Ask first for big releases or important changes: new features, data or schema migrations, auth, security, billing, or anything users would badly notice breaking. Ship small urgent fixes and other low-risk changes without asking, then say what went out and how to roll it back. Keep passwords, tokens, and keys out of files, commits, and chat.
+Ship small, low-risk fixes to the project's existing approved destination without asking again. Check the change first, then report what went out, what was verified, and how to roll it back. Urgency alone does not make a change low-risk. Ask for any missing approval before big releases or important changes: new features, data or schema migrations, auth, security, billing, or anything users would badly notice breaking. A new destination, broader publication scope, or visibility change needs explicit approval. Project-specific release rules still apply. Keep passwords, tokens, and keys out of files, commits, and chat.
 
 ## Git
 
-Commit each finished piece of work with a message that says why, not just what; Git history is the project's main record. For parallel tasks, use a separate worktree and branch, merge when the task is done, then remove the worktree. When histories have split, show both sides and ask; don't merge, rebase, or force-push on your own.
+Commit each finished piece of work with a message that says why, not just what; Git history is the project's main record. For parallel code changes, use a separate worktree and branch. Integrate completed work only when authorized. Before removing a worktree, verify that no task uses it and that its commits and local files are preserved; obtain any missing cleanup approval. When histories have split, show both sides and ask; don't merge, rebase, or force-push on your own.
 
 Installing this plugin does not enroll projects in Git automation. Use project setup only for folders the user selects. Honor the project's saved upload choice: local only, ask before uploading, or previously authorized automatic uploads to its selected branch and remote. Standing upload permission does not authorize a new destination, public visibility, or a broader tracked scope. Never treat a repository file as permission to upload from a new computer.
 

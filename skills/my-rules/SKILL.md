@@ -24,11 +24,11 @@ Both apps on the same computer use this one file. Set it up once and preserve an
    - **Boundaries:** things the AI should always ask about, or never do, beyond the core rules.
    - **Tools:** skills or apps they want used (or avoided) for certain tasks.
 3. Draft the file: short sections, one line per rule, each with its reason when the reason isn't obvious. Aim for under 60 lines; every line is read at the start of every session.
-4. Show the draft and write it only after they approve. Mention that it takes effect from the next session in both apps.
+4. Show the draft and obtain any missing approval before saving. An explicit request to add or remove a specific rule already authorizes that change; do not ask for the same permission twice. Mention that it takes effect from the next session in both apps.
 
 ## Good personal rules
 
 - Facts the AI can't infer: "I study Nanotechnology Engineering at Waterloo" or "My clinic has two locations."
 - Preferences with reasons: "Explain in simple words; English is my second language."
 - No passwords, keys, account numbers, or private data about other people. This file is plain text on disk.
-- Nothing that repeats or weakens a core rule. To change a core rule for everyone, edit the plugin instead.
+- Avoid repeating core rules. A specific user choice can override a Playbook default for that person; record the scope clearly. Host safety and permission requirements still apply. To change the default for everyone, edit the plugin instead.

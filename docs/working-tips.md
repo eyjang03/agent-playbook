@@ -20,6 +20,6 @@ Keep another backup for files Git does not track: recordings, large datasets, ig
 
 Tell it what work you do, your preferred language and level of detail, and which decisions need your input. A few specific rules are easier to follow than a long duplicate manual. Keep passwords and account secrets out of the rules file.
 
-For a substantial task, ask for an ordered plan with a suitable model and reasoning effort for each step. Use the models available in your own account. For publication or permission changes, consider a second model's review; model choice does not replace checking the result.
+For a substantial task, ask for an ordered plan with clear checks. For consequential publication or permission changes, consider an independent review; it does not replace checking the result.
 
 Ask it to finish the authorized work and report what was actually verified, what is inferred, and what remains pending. This is especially useful when a task spans two apps, two computers, or an external service.

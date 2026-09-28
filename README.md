@@ -16,8 +16,10 @@ A shared way of working for **Claude Code** and **Codex**: core rules, project n
 - *"Set up my rules"*: writes your personal rules file after a few questions.
 - *"Set up project notes"*: one `AGENTS.md` (merging any `CLAUDE.md` or `GEMINI.md`), a short `HANDOFF.md`, and a `LOG.md` only when the project needs one.
 - *"Install the playbook tools"*: installs the recommended skills and plugins in both apps, asking first.
-- *"Run the new model check"*: six everyday situations to see how a new AI model follows your rules.
+- *"Run the new model check"*: ten everyday situations to see how a new AI model follows your rules.
 - *"Storm research this"*: a multi-perspective, citation-verified HTML research briefing (five expert lenses, a contradiction map, and primary-source checks).
+
+The core rules guide the agent; they are not a technical gate on every tool call. The plugin does not intercept deployments or outgoing messages. Its Git helper enforces its own saved sync choices. Use the host app and service permissions when an action must be technically blocked.
 
 Project uploads start only after you choose a destination and give permission. Automatic uploads are an optional standing permission for a specific checkout, branch, and remote. Installing the plugin does not enable them.
 
@@ -38,7 +40,7 @@ Needs Git and Python 3.9 or later. Project automation is tested on macOS. Check 
 codex plugin marketplace add eyjang03/agent-playbook
 codex plugin add agent-playbook@agent-playbook
 ```
-Codex asks you to review and approve the plugin's hooks once; until then the rules don't load.
+Codex requires you to review and approve the plugin's hooks before they run. Changed hook definitions can require renewed approval; until approved, those hooks do not load rules or context.
 
 Then say *"Set up Agent Playbook on this computer"*.
 
@@ -65,7 +67,7 @@ Credential checks cover outgoing history, including content removed by later com
 
 Ask *"Keep this project's commits local"* to stop automatic network operations. Ask *"Change this project's upload settings"* to review its choices. Other plugins and tools keep their own behavior.
 
-See [working tips](docs/working-tips.md) for optional habits drawn from using two AI apps across two computers. These include short handoffs, small commits, model choices by task, and checking work on the receiving computer. Use the parts that fit you.
+See [working tips](docs/working-tips.md) for optional habits drawn from using two AI apps across two computers. These include short handoffs, small commits, and checking work on the receiving computer. Use the parts that fit you.
 
 ## Check it's working
 

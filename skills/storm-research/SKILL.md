@@ -13,7 +13,7 @@ argument-hint: "[topic to research]"
 
 ## What this does
 
-Turns one topic into a verified, multi-perspective HTML briefing. It simulates five expert lenses on the topic, maps where they contradict each other, synthesizes everything into a single self-contained HTML report, then adversarially peer-reviews its own output and verifies every citation against its primary source before delivering. The output is one HTML file with no blind spots and no unchecked claims.
+Turns one topic into a verified, multi-perspective HTML briefing. It simulates five expert lenses on the topic, maps where they contradict each other, synthesizes everything into a single self-contained HTML report, then adversarially peer-reviews its own output and verifies every citation against its primary source before delivering. The output is one HTML file that records competing views, verified claims, and remaining uncertainty.
 
 Run the full pipeline end to end. Do not shortcut a phase. This is heavier than a quick web lookup; that is the point.
 
