@@ -18,6 +18,7 @@ A shared way of working for **Claude Code** and **Codex**: core rules, project n
 - *"Install the playbook tools"*: installs the recommended skills and plugins in both apps, asking first.
 - *"Run the new model check"*: twelve everyday situations to see how a new AI model follows your rules.
 - *"Storm research this"*: a multi-perspective, citation-verified HTML research briefing (five expert lenses, a contradiction map, and primary-source checks).
+- *"Ask Gemini to do this"*: hands clear, simple tasks (and second-opinion reviews or video/audio) to Google Gemini through its official Antigravity CLI (`agy`), to save Claude and Codex usage. Uses the newest model, as few parallel calls as the work needs, and a resumable run folder if Gemini usage runs out. Needs `agy` installed and signed in.
 
 The core rules guide the agent; they are not a technical gate on every tool call. The plugin does not intercept deployments or outgoing messages. Its Git helper enforces its own saved sync choices. Use the host app and service permissions when an action must be technically blocked.
 

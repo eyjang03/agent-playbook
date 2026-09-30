@@ -1,0 +1,4 @@
+interface:
+  display_name: "Gemini"
+  short_description: "Hand clear, simple tasks to Gemini to save usage"
+  default_prompt: "Use $gemini to hand this well-scoped task to Gemini through the Antigravity CLI."
