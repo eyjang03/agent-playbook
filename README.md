@@ -6,6 +6,7 @@ A shared way of working for **Claude Code** and **Codex**: core rules, project n
 
 **At the start of every session** (both apps, also after a conversation is compacted):
 - Loads the **core rules**: protecting your work, Git habits, how to keep project notes, checking work honestly, and plain communication. See `rules/core-rules.md`.
+- Keeps unsolicited AI acknowledgments, tool credits, and AI-permission disclaimers out of deliverable files. Process notes stay in the conversation unless the user requests attribution.
 - Adds **your personal rules** from `~/.agent-playbook/personal.md`, if you have one.
 - Shows the project's **`HANDOFF.md`** (where the last session left off) and warns when newer work isn't in it yet.
 - **Memory bridge:** Claude sees Codex's memory summary (only the parts about the current project, plus general notes), and Codex sees Claude's saved notes for the current folder. Nothing is shared if you only use one app.
