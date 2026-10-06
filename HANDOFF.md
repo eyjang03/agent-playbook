@@ -1,7 +1,8 @@
 # Handoff
 
-Updated 2026-09-30.
+Updated 2026-10-05.
 
+- Version 1.2.6 (`80c9907`) adds the `codex` skill: run an OpenAI model through the Codex CLI as a read-only second-model reviewer on an evidence pack. Written from a real GPT-6-Astra xhigh audit run with Codex CLI 0.160.0 (bundled in ChatGPT.app). Bundles regenerated; bundle check, self-test, 38 isolated tests and Claude manifest validation passed. Codex lists the skill too, where it does not apply.
 - Version 1.2.5 adds an important shared writing rule: keep unsolicited AI-assistance acknowledgments, tool credits, and AI-permission disclaimers out of deliverables. Eugene requested this default for all plugin users; explicit user requests for attribution remain authoritative. Both app hook bundles were regenerated; bundle verification, the self-test, 38 isolated tests and whitespace checks passed. Existing chats retain their loaded rules until a fresh session.
 - Version 1.2.3 removes the Stop hook from both apps. A Codex chat still holding the deleted 1.2.1 path looped on the Python exit-2 error and used up Eugene's whole usage allowance. Only SessionStart hooks remain; enrolled projects upload at the next session start. `project.py hook end` still works manually. Chats started before 1.2.3 keep their old Stop hook until the app restarts.
 - Since 1.2.2, both apps' hook commands carry their exact runtime; they do not select a newer installation or skip sync after a cache deletion.
