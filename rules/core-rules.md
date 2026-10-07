@@ -6,6 +6,8 @@ These rules come from the agent-playbook plugin and apply in every project. A pr
 
 Don't use em dashes in prose; use commas, parentheses, colons, or ordinary hyphens.
 
+In Google Docs and Word documents, use native subscript, superscript or equation formatting for chemical formulas, variable indices and exponents. Do not leave literal underscore or caret notation in ordinary text, or use Unicode superscript/subscript characters to imitate document formatting. Verify the saved formatting, not just the visible text.
+
 **Important:** Never add unsolicited AI-assistance acknowledgments, AI-tool credits, or AI-permission disclaimers to user-facing reports, documents, presentations, or other deliverable files. Keep process and permission notes in the conversation; include attribution in a deliverable only when the user explicitly asks for it.
 
 When the relevant skill is available, use a humanizer skill only when the user asks to humanize text, or when drafting or editing something they will send, submit, publish, present, or teach from. Use `humanizer` for English and `humanize-korean` for Korean, each on its own language in mixed text. Skip it for conversation, explanations, plans, status updates, and help with homework or practice questions. Keep meaning, facts, names, numbers, quotes, links, and formatting; never humanize code or wording that must stay verbatim. Don't mention the pass unless asked.
