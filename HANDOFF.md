@@ -1,6 +1,8 @@
 # Handoff
 
-Updated 2026-10-06.
+Updated 2026-10-22.
+
+- Version 1.2.8 makes Ponytail opt-in for one explicit simplification pass for all Playbook users. Adds the self-contained `ponytail-pass` skill with implicit invocation disabled in Claude and Codex, removes upstream Ponytail from recommended installations, and documents migration while preserving other users' settings. This release does not silently disable other plugins on update. Existing chats must be restarted to drop previously injected instructions. Both hook bundles regenerated; 38 isolated tests, self-test, bundle consistency, manifest and whitespace checks passed. Installation on the two Macs is verified separately from source tests.
 
 - Version 1.2.7 adds Eugene's requested shared writing rule: native subscript, superscript or equation formatting in Google Docs and Word for chemical formulas, variable indices and exponents. Literal underscores/carets and Unicode script glyphs are not substitutes for native formatting. Both app hook bundles were regenerated; bundle checks, self-test, 38 isolated tests, Claude marketplace validation and whitespace checks passed. Restricted-shell test failures were Xcode environment warnings; normal local execution passed. Existing chats retain their loaded rules until a fresh session.
 - Version 1.2.6 (`80c9907`) adds the `codex` skill: run an OpenAI model through the Codex CLI as a read-only second-model reviewer on an evidence pack. Written from a real GPT-6-Astra xhigh audit run with Codex CLI 0.160.0 (bundled in ChatGPT.app). Bundles regenerated; bundle check, self-test, 38 isolated tests and Claude manifest validation passed. Codex lists the skill too, where it does not apply.

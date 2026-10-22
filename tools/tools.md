@@ -6,10 +6,16 @@ Install per app, only what the user wants. Check first; skip anything already pr
 |---|---|---|---|---|
 | **humanizer** | Makes English writing sound natural (the core rules say when) | `claude plugin marketplace add blader/humanizer` then `claude plugin install humanizer@humanizer` | `npx skills add blader/humanizer -g -a codex` | `claude plugin list`; `~/.codex/skills/humanizer` |
 | **humanize-korean** | The same for Korean writing | `claude plugin marketplace add epoko77-ai/im-not-ai` then `claude plugin install humanize-korean@im-not-ai` (and `claude plugin enable` it if it was installed but off) | clone `https://github.com/epoko77-ai/im-not-ai`, then run `./install.sh --codex-only` inside it | `claude plugin list`; `~/.codex/skills/humanize-korean` |
-| **ponytail** | "Simplest thing that works" coding style | `claude plugin marketplace add DietrichGebert/ponytail` then `claude plugin install ponytail@ponytail` | `codex plugin marketplace add DietrichGebert/ponytail` then `codex plugin add ponytail@ponytail`, then approve its hooks | `claude plugin list`; `codex plugin list` |
+| **ponytail-pass** (bundled) | One explicitly requested, behavior-preserving simplification pass | `/agent-playbook:ponytail-pass` or explicitly ask for a simplification pass | Explicitly select `$ponytail-pass` or ask for a simplification pass | Bundled skill present; upstream Ponytail disabled |
 | **hyperframes** (about 18 video skills) | Making videos, captions, and motion graphics from HTML | `npx skills add heygen-com/hyperframes -g` | same install (Codex reads `~/.agents/skills`) | `~/.agents/skills/hyperframes` |
 | **frontend-design** | Distinctive visual design for web UI | `npx skills add anthropics/skills --skill frontend-design -g` | add `-a codex` to the same command | `~/.agents/skills/frontend-design` |
 | **web-design-guidelines** | Reviewing UI against web interface guidelines | `npx skills add vercel-labs/agent-skills --skill web-design-guidelines -g` | add `-a codex` to the same command | `~/.agents/skills/web-design-guidelines` |
+
+## Existing Ponytail installations
+
+The upstream plugin is no longer a recommended always-on tool. Keep it disabled; the bundled `ponytail-pass` skill provides the explicit-only workflow without installing it. During a user-authorized tools setup or migration, disable an enabled Claude installation with `claude plugin disable ponytail@ponytail --scope user`. Inspect project/local overrides too. In Codex, turn off the installed Ponytail plugin through its plugin settings, preserving unrelated settings. A configured default mode of `off` alone is insufficient because versions can share mode flags across chats.
+
+Preserve the installed files and unrelated statusline components. If removing a Ponytail-only statusline, back up the settings first. Start fresh chats after changing plugin activation; old chats can retain injected instructions or loaded hooks. Do not silently change another user's installed-plugin settings merely because their Playbook updated: explain the new default and apply migration when setup or migration is authorized.
 
 Notes:
 - `npx` needs Node.js. Ask before installing it.
