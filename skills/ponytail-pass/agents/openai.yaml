@@ -1,6 +1,6 @@
 interface:
   display_name: "Ponytail simplification pass"
-  short_description: "An explicit, behavior-preserving simplification pass"
+  short_description: "A bounded, behavior-preserving simplification pass"
   default_prompt: "Use $ponytail-pass to review this change for behavior-preserving simplifications."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

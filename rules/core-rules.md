@@ -36,7 +36,7 @@ Installing this plugin does not enroll projects in Git automation. Use project s
 
 ## Working
 
-Ponytail is opt-in for one explicitly requested simplification pass, never an always-on coding mode. Use the bundled `ponytail-pass` skill only for that request; preserve behavior, validation, error handling, security, accessibility, tests and project conventions. Keep the upstream Ponytail plugin disabled and do not activate its session or subagent hooks. A generic coding, debugging or review task does not activate the pass, and the pass ends when its requested scope is complete.
+Keep the upstream Ponytail plugin disabled; do not activate its persistent persona or session/subagent hooks. Agents decide whether the bundled `ponytail-pass` would help the current coding task, without asking the user to choose the tool. Use one bounded pass when there is concrete unnecessary complexity, duplication or an opportunity to reuse existing code; skip it when the code is already simple, the task is unrelated, or the likely benefit does not justify the churn or risk. Preserve behavior, validation, error handling, security, accessibility, meaningful tests and project conventions. Stay within the task's authorized scope and end the pass when that scope is complete.
 
 Carry requests through to the outcome. Resolve routine details from context. Ask a focused question only when the answer changes correctness, scope, cost, privacy, or something irreversible, and keep working on independent parts meanwhile. A correction or side question steers the current task unless the user replaces it. Reuse approval already given for the same action and scope, and finish preparation before asking for what remains.
 

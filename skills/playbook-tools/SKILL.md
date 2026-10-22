@@ -1,6 +1,6 @@
 ---
 name: playbook-tools
-description: Installs and checks the agent-playbook's recommended tools (humanizer, humanize-korean, the bundled explicit-only ponytail-pass, hyperframes video skills, frontend-design, web-design-guidelines) in Claude Code and Codex, and checks that the playbook itself is running. Use when the user says "install the playbook tools", sets up a new computer, or asks whether their tools or the playbook are working.
+description: Installs and checks the agent-playbook's recommended tools (humanizer, humanize-korean, the bundled agent-selected ponytail-pass, hyperframes video skills, frontend-design, web-design-guidelines) in Claude Code and Codex, and checks that the playbook itself is running. Use when the user says "install the playbook tools", sets up a new computer, or asks whether their tools or the playbook are working.
 ---
 
 # Playbook tools
@@ -12,7 +12,7 @@ Run `python3 scripts/playbook.py status` from this plugin's folder. Each app the
 ## 2. Tools
 
 1. Read `tools/tools.md` in this plugin's folder.
-2. Follow the Ponytail migration notes in `tools/tools.md`: its upstream plugin stays disabled; the bundled explicit-only `ponytail-pass` is already available. An authorized tools setup covers this migration. Do not enable Ponytail to make a status table look complete.
+2. Follow the Ponytail migration notes in `tools/tools.md`: its upstream plugin stays disabled; the bundled agent-selected `ponytail-pass` is already available. An authorized tools setup covers this migration. Do not enable Ponytail to make a status table look complete.
 3. For each tool and each app the user has, run the check and build a short table: installed, missing, or installed but switched off.
 4. Ask which missing tools to install, per app. Mention what each is for in a few words; don't assume they want all of them.
 5. Install the chosen ones with the listed commands, one tool at a time. If a command asks questions, answer from the table or ask the user. Don't install Node.js without asking.
