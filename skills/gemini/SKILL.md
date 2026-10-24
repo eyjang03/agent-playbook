@@ -35,6 +35,17 @@ agy -p "<self-contained task>" --model gemini-3.8-flash-medium --output-format j
 
 - Permissions: the default is read-only (writes and shell are auto-denied and listed in `denied_actions`). `--mode accept-edits` also allows file edits, still no shell. Never pass `--dangerously-skip-permissions`. For code changes, prefer asking for a patch and applying it yourself.
 - Result: read `.response`; check `.status` and `.denied_actions`. Continue the same thread with `--conversation <conversation_id>`.
+- An empty `.response` with `RunCommand` in `denied_actions` (and `status` still `SUCCESS`) means the call failed, not that Gemini had nothing to say: see the next section.
+
+## Keep Gemini off the shell
+
+In headless mode the first shell command Gemini tries (`ls`, `pdftotext`, `python3`) ends the whole call with no answer. Reviews and audits trigger this most: it emptied the first call of three audits in October 2026, while prompts written as below never failed. In every prompt:
+
+- Say that shell commands are blocked, so it reads files with its file-reading tool and does any arithmetic in its reasoning.
+- Name the exact path of every file it needs instead of asking it to look around, and pass folders outside the project with `--add-dir`.
+- Convert what it can't read directly into the run folder before the call: PDFs to page-marked text (`pdftotext -f N -l N` per page, each page headed `=== page N ===`), and, when it has to judge layout or figures, pages to PNG (`pdftoppm -r 70 -png`). Gemini reads PNG images with its file tool, so a layout check need not be text-only.
+
+If a call still comes back empty this way, rerun it once with these points made explicit.
 - Codex: its sandbox blocks network access, so request approval to run `agy` outside the sandbox.
 - Not installed: `agy` is Google's Antigravity CLI; ask the user to install it from Google's Antigravity site rather than installing it yourself.
 - `authentication required`: the user must run `agy` once in a terminal to sign in; it can't be done headless.
