@@ -38,7 +38,8 @@ class HookUpdateTests(unittest.TestCase):
         for app, name in (("codex", "codex-hooks.json"), ("claude", "hooks.json")):
             doc = json.loads((self.cache / "hooks" / name).read_text())["hooks"]
             self.commands[app] = {"rules": doc["SessionStart"][0]["hooks"][0]["command"],
-                                  "context": doc["SessionStart"][0]["hooks"][1]["command"]}
+                                  "context": doc["SessionStart"][0]["hooks"][1]["command"],
+                                  "personal": doc["SessionStart"][0]["hooks"][2]["command"]}
 
     def run_hook(self, app, action, command=None, payload=None):
         result = subprocess.run(["/bin/sh", "-c", command or self.commands[app][action]],
@@ -72,7 +73,7 @@ class HookUpdateTests(unittest.TestCase):
             out = self.run_hook(app, "rules")
             context = out["hookSpecificOutput"]["additionalContext"]
             self.assertIn("Agent Playbook core rules", context)
-            self.assertIn("Personal fixture preference", context)
+            self.assertIn("Personal fixture preference", self.run_hook(app, "personal")["hookSpecificOutput"]["additionalContext"])
             status = json.loads((self.state / "status.json").read_text())
             self.assertEqual(status[app]["rules"]["version"], json.loads((ROOT / ".codex-plugin/plugin.json").read_text())["version"])
         self.assertFalse(list(self.tmp.glob("agent-playbook-hook-*")))
@@ -134,12 +135,14 @@ class HookUpdateTests(unittest.TestCase):
 
     def test_concurrent_hooks_use_separate_runtime_directories(self):
         shutil.rmtree(self.cache)
-        actions = [(app, action) for app in self.commands for action in ("rules", "context")]
+        actions = [(app, action) for app in self.commands for action in ("rules", "context", "personal")]
+        self.state.mkdir(exist_ok=True)
+        (self.state / "personal.md").write_text("Personal preference")
         with ThreadPoolExecutor(max_workers=6) as pool:
             list(pool.map(lambda pair: self.run_hook(*pair), actions))
         status = json.loads((self.state / "status.json").read_text())
         for app in self.commands:
-            self.assertEqual(set(status[app]), {"rules", "context"})
+            self.assertEqual(set(status[app]), {"rules", "context", "personal"})
         self.assertFalse(list(self.tmp.glob("agent-playbook-hook-*")))
 
     def test_project_cannot_shadow_runtime_imports(self):
@@ -151,13 +154,37 @@ class HookUpdateTests(unittest.TestCase):
 
     def test_corrupt_runtime_warns_without_retry_exit_code(self):
         for app in self.commands:
-            for action in ("rules", "context"):
+            for action in ("rules", "context", "personal"):
                 args = shlex.split(self.commands[app][action])
                 args[3] = args[3].replace('ARCHIVE_SHA256 = "', 'ARCHIVE_SHA256 = "invalid')
                 out = self.run_hook(app, action, command=shlex.join(args))
                 self.assertIn("did not complete", out["systemMessage"])
                 self.assertIn("hookSpecificOutput", out)
         self.assertFalse((self.state / "status.json").exists())
+
+    def test_long_personal_rules_reach_each_app_completely(self):
+        self.state.mkdir()
+        personal = "# Personal rules\n\n" + "Preference detail.\n" * 260
+        personal += "## Emails\nSchool greeting and signature.\n## Final section\nTAIL RULE\n"
+        (self.state / "personal.md").write_text(personal)
+        for app in self.commands:
+            core = self.run_hook(app, "rules")["hookSpecificOutput"]["additionalContext"]
+            actual = self.run_hook(app, "personal")["hookSpecificOutput"]["additionalContext"]
+            self.assertEqual(actual, personal.strip())
+            self.assertIn("Agent Playbook core rules", core)
+            self.assertNotIn("truncated", actual)
+            self.assertLess(len(actual), 10000)  # Claude's per-value spill threshold.
+            self.assertLess(len(core), 10000)
+
+    def test_long_handoff_leaves_room_for_memory(self):
+        (self.work / "HANDOFF.md").write_text("# Handoff\n" + "Long paragraph. " * 4000)
+        memory = self.home / ".codex/memories"
+        memory.mkdir(parents=True)
+        (memory / "memory_summary.md").write_text("## General\nMEMORY SURVIVES")
+        out = self.run_hook("claude", "context")["hookSpecificOutput"]["additionalContext"]
+        self.assertIn("MEMORY SURVIVES", out)
+        self.assertIn("truncated; open HANDOFF.md", out)
+        self.assertLess(len(out), 9000)
 
     def test_zsh_can_run_the_saved_command_after_cache_deletion(self):
         zsh = shutil.which("zsh")

@@ -140,3 +140,7 @@ I use, run the checks, explain how to update, and report anything still pending.
 ## License
 
 MIT
+
+## Complete startup instructions
+
+Version 1.2.11 emits core rules and personal rules through separate SessionStart handlers, so preferences never lose space to core rules. Keep each required rules file below 9,000 characters (Claude spills any single value above 10,000). Handoffs and memory summaries have separate 4,500 and 3,500 character allowances. Open the named file when a supporting summary is truncated. After updating, review the changed Codex hook definition and start fresh chats in both apps.

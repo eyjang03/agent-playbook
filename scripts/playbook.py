@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Agent Playbook session-start context for Claude Code and Codex.
 
-  playbook.py start --app claude|codex --part rules     core rules + the user's personal rules
+  playbook.py start --app claude|codex --part rules     complete core rules
+  playbook.py start --app claude|codex --part personal  complete personal rules
   playbook.py start --app claude|codex --part context   memory bridge + project handoff
   playbook.py status                                     when the hooks last ran, and what they found
   playbook.py test                                       self-check in a throwaway home folder
@@ -22,6 +23,8 @@ import project as project_setup
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PART_LIMIT = 9000  # characters per hook output; each part stays well under the apps' limits
 HANDOFF_LINES = 60
+HANDOFF_LIMIT = 4500
+MEMORY_LIMIT = 3500
 
 
 def home(*parts):
@@ -48,19 +51,22 @@ def project_root(cwd):
     return git(cwd, "rev-parse", "--show-toplevel") or cwd
 
 
-def clip(text, source):
-    if len(text) <= PART_LIMIT:
+def clip(text, source, limit=PART_LIMIT):
+    if len(text) <= limit:
         return text
-    return text[:PART_LIMIT].rsplit("\n", 1)[0] + "\n... (truncated; open %s for the rest)" % source
+    notice = "\n... (truncated; open %s for the rest)" % source
+    return text[:limit - len(notice)].rsplit("\n", 1)[0] + notice
 
 
 # --- rules -------------------------------------------------------------------
 
 def rules_part():
-    core = read(os.path.join(ROOT, "rules", "core-rules.md")).strip()
-    personal = read(home(".agent-playbook", "personal.md")).strip()
-    text = core + ("\n\n# Personal rules\n\n" + personal if personal else "")
-    return clip(text, "the agent-playbook rules files")
+    return read(os.path.join(ROOT, "rules", "core-rules.md")).strip()
+
+
+def personal_part():
+    # Required preferences have their own handler and never compete with core rules.
+    return read(home(".agent-playbook", "personal.md")).strip()
 
 
 # --- memory bridge -------------------------------------------------------------
@@ -127,9 +133,10 @@ def handoff_for(project):
 
 def context_part(app, cwd):
     project = project_root(cwd)
-    pieces = [handoff_for(project)]
-    pieces.append(codex_memory_for(project) if app == "claude" else claude_memory_for(project))
-    return clip("\n\n".join(p for p in pieces if p), "HANDOFF.md or the memory files")
+    memory = codex_memory_for(project) if app == "claude" else claude_memory_for(project)
+    pieces = [clip(handoff_for(project), "HANDOFF.md", HANDOFF_LIMIT),
+              clip(memory, "the memory files", MEMORY_LIMIT)]
+    return "\n\n".join(p for p in pieces if p)
 
 
 # --- status ------------------------------------------------------------------
@@ -168,11 +175,12 @@ def status():
 def start(app, part, cwd):
     if part == "rules":
         text = rules_part()
+    elif part == "personal":
+        text = personal_part()
     else:
         # Fetch before reading HANDOFF, even when the host runs separate hooks in parallel.
         message = project_setup.run("start", cwd, app)
-        text = clip(("[agent-playbook project] " + message + "\n\n" if message else "") + context_part(app, cwd),
-                    "HANDOFF.md or the memory files")
+        text = (clip("[agent-playbook project] " + message, "project sync status", 700) + "\n\n" if message else "") + context_part(app, cwd)
     record(app, part, cwd, len(text))
     if not text:
         return {}
@@ -189,7 +197,7 @@ def main(argv):
     try:
         payload = {} if sys.stdin.isatty() else json.loads(sys.stdin.read() or "{}")
         cwd = payload.get("cwd") or os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
-        if argv[1:2] == ["start"] and args.get("--app") in ("claude", "codex") and args.get("--part") in ("rules", "context"):
+        if argv[1:2] == ["start"] and args.get("--app") in ("claude", "codex") and args.get("--part") in ("rules", "personal", "context"):
             out = start(args["--app"], args["--part"], cwd)
     except Exception:  # never break a session
         out = {}
@@ -221,8 +229,9 @@ def selftest():
         # Rules: core always, personal only when present.
         rules = ctx(start("claude", "rules", project))
         assert "Agent Playbook core rules" in rules and "Personal rules" not in rules
+        assert "Agent Playbook core rules" in ctx(start("codex", "rules", project))
         write(os.path.join(tmp, ".agent-playbook", "personal.md"), "Prefer metric units.")
-        assert "Prefer metric units." in ctx(start("codex", "rules", project))
+        assert "Prefer metric units." in ctx(start("codex", "personal", project))
 
         # Nothing to add in an empty folder.
         assert start("claude", "context", project) == {}

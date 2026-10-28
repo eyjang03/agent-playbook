@@ -38,7 +38,7 @@ def documents(root=ROOT):
             command = shlex.join(["python3", "-I", "-c", source, app, action])
             if len(command.encode("utf-8")) > MAX_COMMAND_BYTES:
                 raise ValueError("Hook command exceeds the tested size budget")
-            item = {"type": "command", "command": command, "timeout": 30 if action == "rules" else 120}
+            item = {"type": "command", "command": command, "timeout": 120 if action == "context" else 30}
             if app == "codex":
                 item["additionalContextLimit"] = 8000
                 if action == "rules":
@@ -47,7 +47,7 @@ def documents(root=ROOT):
         # ponytail: no Stop hook. A host retries a failing Stop hook every turn, which
         # burned a whole usage allowance when an old session kept a deleted path.
         # Enrolled projects upload at the next session start instead.
-        doc = {"hooks": {"SessionStart": [{"hooks": [hook("rules"), hook("context")]}]}}
+        doc = {"hooks": {"SessionStart": [{"hooks": [hook("rules"), hook("context"), hook("personal")]}]}}
         outputs[root / "hooks" / filename] = json.dumps(doc, indent=2) + "\n"
     return outputs
 

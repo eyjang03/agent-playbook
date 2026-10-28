@@ -26,7 +26,7 @@ def failure(app, action):
                "This hook did not complete; rules, context, or project sync may be missing. "
                "Reinstall the plugin and reload the session, then check playbook status.")
     output = {"systemMessage": message}
-    if action in ("rules", "context"):
+    if action in ("rules", "personal", "context"):
         output["hookSpecificOutput"] = {
             "hookEventName": "SessionStart", "additionalContext": message}
     print(json.dumps(output))
@@ -35,7 +35,7 @@ def failure(app, action):
 def main():
     app, action = (sys.argv[1:] + ["", ""])[:2]
     try:
-        if len(sys.argv) != 3 or app not in ("codex", "claude") or action not in ("rules", "context"):
+        if len(sys.argv) != 3 or app not in ("codex", "claude") or action not in ("rules", "personal", "context"):
             raise ValueError("Invalid hook arguments")
         archive = base64.b64decode(ARCHIVE_B64, validate=True)
         if hashlib.sha256(archive).hexdigest() != ARCHIVE_SHA256:
