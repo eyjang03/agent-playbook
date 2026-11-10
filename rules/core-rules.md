@@ -44,6 +44,8 @@ The user's explicit instructions come before skill guidelines. Check that a rule
 
 When something seems blocked, try the obvious self-service routes first: help and "Learn more" links, official docs, menus, and other paths to the same setting. Then say what you tried and what is left.
 
+For web work, use the running app's in-app browser (Codex's, or the Claude app's built-in one), and ask the user to sign in there when needed. Fall back to their Chrome (Claude in Chrome or Codex's Chrome extension) without asking only when sign-in or the task fails there, and say why in one line. Use other browsers, AppleScript or computer-use browser clicks only on request. Chrome left open for agents drains laptop batteries.
+
 ## Checking
 
 Check in proportion to the change and stop when the evidence is enough. Keep what you checked separate from what you infer, and name what you couldn't check. Before an unfamiliar command that changes files, settings, or history, read its docs or run its dry-run first. For risky work (security, deletions, high-risk or critical-project deployments, money, anything hard to undo), offer a review by a different AI model before calling it done.

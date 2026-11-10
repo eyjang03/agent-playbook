@@ -1,6 +1,8 @@
 # Handoff
 
-Updated 2026-10-28.
+Updated 2026-11-09.
+
+- Version 1.2.12 adds a core browser rule at Eugene's request, as the default for all Playbook users: use the running app's in-app browser first (Codex's in-app browser, the Claude app's built-in browser), ask for sign-in there, and fall back to Chrome without asking only when sign-in or the task fails there, saying why. Other browsers, AppleScript and computer-use browser clicks need the user's request. Reason: Chrome left open for agent work drained his MacBook battery. Rules text only; hook bundles rebuilt. Codex may ask to re-approve the changed hook.
 
 - Version 1.2.11 separates complete personal rules from core rules so long core instructions cannot remove user preferences. Handoff and memory have independent 4,500/3,500 character allowances. Both bundles rebuilt; 40 isolated tests and self-test pass. Install and review the changed Codex hooks on each host; verify all three parts in fresh sessions. Existing sessions keep their earlier runtime.
 
