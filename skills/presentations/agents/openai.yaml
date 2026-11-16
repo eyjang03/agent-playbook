@@ -1,0 +1,6 @@
+interface:
+  display_name: "Presentations"
+  short_description: "Spoken scripts that build, and slides that support them"
+  default_prompt: "Use $presentations to write the script and slides for this talk."
+policy:
+  allow_implicit_invocation: true

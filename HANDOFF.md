@@ -1,6 +1,8 @@
 # Handoff
 
-Updated 2026-11-09.
+Updated 2026-11-15.
+
+- Version 1.2.13 adds the `presentations` skill and one core writing rule, for all Playbook users. Eugene asked on 2026-11-15 for general script-and-presentation guidance after correcting the same script problems by hand in three talks. The skill loads whenever an agent writes or revises a spoken script or slides: start from the user's earlier scripts and the time limit, build the script as a connected story, don't read the slide, keep the script file to the words said, read it aloud, one point per slide, credited real images, and a check in the presenting app. Codex may select it implicitly (`agents/openai.yaml`). The core rule keeps version or date stamps, word counts and process notes out of deliverables unless asked. It is shorter than first drafted because `rules/core-rules.md` is now 8,997 characters against the 9,000 guideline: trim an existing rule before adding another. Hook bundles rebuilt; Codex may ask to re-approve the changed hook. Bundle check, self-test, 40 isolated tests, Claude manifest validation and whitespace checks passed. Not yet installed or tried in a fresh session of either app.
 
 - Version 1.2.12 adds a core browser rule at Eugene's request, as the default for all Playbook users: use the running app's in-app browser first (Codex's in-app browser, the Claude app's built-in browser), ask for sign-in there, and fall back to Chrome without asking only when sign-in or the task fails there, saying why. Other browsers, AppleScript and computer-use browser clicks need the user's request. Reason: Chrome left open for agent work drained his MacBook battery. Rules text only; hook bundles rebuilt. Codex may ask to re-approve the changed hook.
 
