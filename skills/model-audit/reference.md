@@ -10,9 +10,19 @@ How `scripts/` work, what a reviewer can and cannot do, how to qualify a Mac, an
 | `mkprofile.sh` | Writes the sandbox profile for one reviewer and checks the grants. |
 | `inputs.py` | Hashes inputs as data (projects, files, packs, agy history) without following links, executing anything or blocking on special files; every mode has a deadline. |
 | `boxcheck.c` | Compiled per run: finds this reviewer's processes anywhere on the Mac by their sandbox, so cleanup also catches a process that detached. |
-| `capcheck.sh`, `capcheck-setup.sh`, `t.tex` | Capability check: a reviewer runs `capcheck.sh` inside; `capcheck-setup.sh` makes the fixtures and positive controls outside and confirms from outside at teardown. |
+| `capcheck.sh`, `capcheck-setup.sh`, `t.tex` | Capability check: a reviewer runs `capcheck.sh` inside (it also saves its output to the reviewer's `tmp/capcheck-result.txt`); `capcheck-setup.sh` makes the fixtures and positive controls outside and confirms from outside at teardown. |
+| `qualify.sh` | Runs the whole qualification for every installed CLI and reports one line per CLI. |
 
-Settings (environment variables): `AUDIT_CODEX_HOME` (Codex home for Codex reviewers, for example a second account's; default `~/.codex`), `AUDIT_PROTECTED` (colon-separated folders no grant may open, such as a folder that holds many projects), `AUDIT_TIMEOUT_MIN` (default 240), `CLAUDE_BIN`, `CODEX_BIN`, `AGY_BIN` (CLI paths), `AUDIT_HIDE_FIXTURE=yes` (qualification only).
+Settings (environment variables). Export them once for every launch of a round and for `capcheck-setup.sh`, identically. Paths must be absolute (a relative or `~` entry is refused) and are compared as real paths, so links and trailing slashes do not matter:
+
+- `AUDIT_CODEX_HOME`: the Codex home Codex reviewers use (for example a second account's); default `~/.codex`. It and `~/.codex` are always closed to reviewers.
+- `AUDIT_PRIVATE`: colon-separated folders closed from every side (no grant may include them or lie inside them), such as every other Codex home or CLI sign-in folder on the Mac, whether or not this run uses it.
+- `AUDIT_PROTECTED`: colon-separated collections, such as a folder that holds many projects: the folder itself and anything above it cannot be granted, while single projects inside it can.
+- `AUDIT_TIMEOUT_MIN` (default 240); `CLAUDE_BIN`, `CODEX_BIN`, `AGY_BIN` (CLI paths); `AUDIT_HIDE_FIXTURE=yes` and the `QUALIFY_*` settings in `qualify.sh` (qualification only).
+
+Apple's `/usr/bin/python3` prints an `xcrun_db` cache warning to stderr inside the sandbox; it is harmless (the per-user cache folder is closed).
+
+Requested and confirmed model: the launcher records the requested model and effort in `meta.txt`. Codex prints the model and effort it used at the top of `run.log`; Claude's JSON output names the model (`modelUsage`) but not the effort; agy reports neither, so its model is recorded as requested only.
 
 ## What a reviewer gets
 
@@ -38,10 +48,10 @@ macOS's sandbox cannot close the first three; running reviewers as a separate ma
 
 ## Qualification
 
-On each Mac, before the first audit and after any change to macOS, a CLI or these scripts. Run it from the agent app on that Mac (an SSH session cannot use the keychain, and a job started over SSH cannot read `~/Documents`).
+On each Mac, before the first audit and after any change to macOS, a CLI or these scripts, run from the agent app on that Mac (an SSH session cannot use the keychain, and a job started over SSH cannot read `~/Documents`):
 
-1. Make an audit folder (`mktemp -d /tmp/audit-XXXXXX`, then `: > .audit-folder`) and, for each CLI, its own round folder with one reviewer folder: `$A/<cli>/<cli>/pack/PROMPT.md` asking it to run exactly `bash tools/capcheck.sh <cli>` and reply with `VERDICT: READY`, the output, `## Required changes` (None) and `## Checks performed`.
-2. `AUDIT_HIDE_FIXTURE=yes scripts/capcheck-setup.sh setup <reviewer> <another reviewer> <launcher folder> <cli> [project python] [git project]` for each CLI. It makes unique fixtures, each with a positive control outside the sandbox, and writes two grants to `<reviewer>/capcheck-grants` for a disposable project whose record and `.git` must stay hidden. It never shows a permission prompt: keyboard checks run only where the starting app already has Input Monitoring.
-3. Run each CLI with a cheap model through `run-reviewer.sh`, granting the git project and the two fixture grants.
-4. Read the result from `<reviewer>/tmp/capcheck-result.txt` (a cheap model may copy only part of the output or answer READY regardless) and require `FAILED=0`; the expected number of checks depends on what works on that Mac.
-5. `scripts/capcheck-setup.sh teardown <reviewer>` must exit 0: it confirms from outside that no background job, local-service connection or app-socket connection happened, and removes the fixtures.
+```bash
+scripts/qualify.sh [git project to grant]
+```
+
+For each installed CLI it makes an audit folder with its own round folder, sets up unique fixtures with positive controls outside the sandbox (including a disposable project whose record and `.git` must stay hidden), runs `capcheck.sh` through the launcher with a cheap model, reads the result from the reviewer's `tmp/capcheck-result.txt` (a cheap model may copy only part of the output or answer READY regardless), and tears the fixtures down, confirming from outside that no background job, local-service connection or app-socket connection happened. It prints one line per CLI and exits 0 only when every check and teardown passed. The number of checks depends on what applies on that Mac (for example the keyboard checks need Input Monitoring for the starting app, which is checked without ever showing a permission prompt; the LaTeX check needs Tectonic; the Homebrew check needs a writable Homebrew prefix). The cheap models come from the `QUALIFY_*` settings, or a light model each CLI lists.

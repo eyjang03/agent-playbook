@@ -19,19 +19,27 @@ case $AUD in /private/tmp/?*/?*|/private/tmp/audit-?*) ;; *) echo "audit folder 
 q() { local s=${1//\\/\\\\}; printf '"%s"' "${s//\"/\\\"}"; }        # quote a path for the profile
 rx() { printf %s "$1" | sed 's#[]*.^$()+?{}|\\[]#\\&#g; s#"#\\"#g'; }           # escape a path for a regex
 UT=$(cd "$(getconf DARWIN_USER_TEMP_DIR)" && pwd -P); UC=$(cd "$(getconf DARWIN_USER_CACHE_DIR)" && pwd -P); UD=$(dirname "$UT")
-BRIDGE=${AUDIT_CODEX_HOME:-$H/.codex}   # the Codex home used for audits (kept closed like every CLI login)
-PROTECTED=("$H" /Users /Volumes "$AUD" "$ST" "$BRIDGE" "$UT" "$UC" "$H/Documents" "$H/Desktop" "$H/Downloads")
-IFS=: read -ra EXTRA <<< "${AUDIT_PROTECTED:-}"   # more folders a grant may never open, such as a folder of projects
-for a in "${EXTRA[@]:-}"; do [ -n "$a" ] && PROTECTED+=("$a"); done
+real() {   # settings are compared as real paths; a relative or "~" entry would be silently meaningless, so it is refused
+  case $1 in /*) ;; *) echo "audit settings need absolute paths: $1" >&2; exit 2 ;; esac
+  [ -e "$1" ] || echo "note: an audit setting names a folder that does not exist: $1" >&2
+  /usr/bin/python3 -I -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$1"; }
+# AUDIT_PRIVATE: folders closed from every side, whatever the grant (CLI sign-in homes such as a second account's Codex
+# home, whichever account a run uses). AUDIT_PROTECTED: collections, such as a folder of projects: the folder itself and
+# anything above it cannot be granted, while single projects inside it can.
+PRIVATE=("$(/usr/bin/python3 -I -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$H/.codex")")
+if [ -n "${AUDIT_CODEX_HOME:-}" ]; then r=$(real "$AUDIT_CODEX_HOME") || exit 2; PRIVATE+=("$r"); fi
+IFS=: read -ra EXTRA <<< "${AUDIT_PRIVATE:-}"; for a in "${EXTRA[@]:-}"; do [ -n "$a" ] || continue; r=$(real "$a") || exit 2; PRIVATE+=("$r"); done
+PROTECTED=("$H" /Users /Volumes "$AUD" "$ST" "$UT" "$UC" "$H/Documents" "$H/Desktop" "$H/Downloads")
+IFS=: read -ra EXTRA <<< "${AUDIT_PROTECTED:-}"; for a in "${EXTRA[@]:-}"; do [ -n "$a" ] || continue; r=$(real "$a") || exit 2; PROTECTED+=("$r"); done
 
 above() { [ "$1" = / ] || case $2 in "$1"|"$1"/*) true ;; *) false ;; esac; }   # is $1 equal to or above $2?
 risky() {  # never readable as a grant: home, other users, the audit folder, CLI state and logins, temp folders, ~/Library
-  local a
-  for a in "${PROTECTED[@]}"; do above "$1" "$a" && return 0; done
-  for a in "$AUD" "$H/Library" "$H/.ssh" "$H/.aws" "$H/.gnupg" "$H/.config" "$H/.claude" "$H/.codex" "$H/.gemini" "$H/.agents" "$BRIDGE" "$ST" "$UT" "$UC"; do
+  local a                        # $2 = conda: a conda base may sit directly in home; every other rule still applies
+  for a in "${PROTECTED[@]}" "${PRIVATE[@]}"; do above "$1" "$a" && return 0; done
+  for a in "$AUD" "$H/Library" "$H/.ssh" "$H/.aws" "$H/.gnupg" "$H/.config" "$H/.claude" "$H/.codex" "$H/.gemini" "$H/.agents" "${PRIVATE[@]}" "$ST" "$UT" "$UC"; do
     above "$a" "$1" && return 0
   done
-  [ "$(dirname "$1")" = "$H" ] && return 0       # loose files and folders directly in home (~/.zshrc, ~/Pictures)
+  [ "${2:-}" != conda ] && [ "$(dirname "$1")" = "$H" ] && return 0   # loose files and folders directly in home (~/.zshrc, ~/Pictures)
   return 1
 }
 READ=""; HIDE=""; PROJECTS=(); CONDA_HIDE=""; CONDA_ENVS=""
@@ -55,7 +63,7 @@ pyroot() {  # print the installation root to grant for an interpreter's prefix (
   esac
 }
 is_conda_root() { local r; for r in "${CONDA_ROOTS[@]}"; do [ "$1" = "$r" ] && return 0; done; return 1; }
-base_ok() { is_conda_root "$1" || ! risky "$1"; }   # a conda base sits directly in home, which risky() refuses
+base_ok() { if is_conda_root "$1"; then ! risky "$1" conda; else ! risky "$1"; fi; }   # a conda base may sit directly in home
 grant_base() {  # grant an installation root; a conda base keeps its environments hidden unless one is granted itself
   local r; READ+=" (subpath $(q "$1"))"
   is_conda_root "$1" && CONDA_HIDE+=" (subpath $(q "$1/envs"))"

@@ -11,10 +11,7 @@
 #include <unistd.h>
 #include <sys/proc_info.h>
 #include <sys/sysctl.h>
-static int zombie(pid_t pid) {   /* an exited process waiting to be collected: it cannot run anything */
-    struct kinfo_proc kp; size_t len = sizeof kp; int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, pid};
-    return sysctl(mib, 4, &kp, &len, NULL, 0) == 0 && len == sizeof kp && kp.kp_proc.p_stat == SZOMB;
-}
+
 enum { SANDBOX_FILTER_PATH = 1, SANDBOX_CHECK_NO_REPORT = 0x40000000 };
 int sandbox_check(pid_t pid, const char *operation, int type, ...);
 int main(int argc, char **argv) {
@@ -28,8 +25,14 @@ int main(int argc, char **argv) {
     for (int i = 0; i < n; i++) {
         struct proc_bsdinfo info;
         if (proc_pidinfo(pids[i], PROC_PIDTBSDINFO, 0, &info, sizeof info) != sizeof info) {
-            if (pids[i] > 1 && kill(pids[i], 0) == 0 && !zombie(pids[i])) unknown++;   /* alive and ours (we may signal it), but unreadable; pid 0 is the kernel (kill(0) means our own group) */
-            continue;   /* exited, or another user's process */
+            /* details refused (for example a root-owned login process of this user's terminal): the kernel's process
+               table still gives owner, start time and state; only a live process of this user that started during
+               the attempt and still cannot be read leaves ownership unknown */
+            struct kinfo_proc kp; size_t len = sizeof kp; int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, pids[i]};
+            if (pids[i] > 1 && sysctl(mib, 4, &kp, &len, NULL, 0) == 0 && len == sizeof kp && kp.kp_proc.p_stat != SZOMB
+                && (kp.kp_eproc.e_ucred.cr_uid == me || kp.kp_eproc.e_pcred.p_ruid == me)
+                && (long)kp.kp_proc.p_starttime.tv_sec >= since) unknown++;
+            continue;   /* exited, another user's, or older than this attempt */
         }
         if (info.pbi_uid != me || (long)info.pbi_start_tvsec < since) continue;
         /* an error (-1) for a process that is still alive leaves its ownership unknown: never silently skipped */

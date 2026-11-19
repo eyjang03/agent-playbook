@@ -1,6 +1,6 @@
 ---
 name: gemini
-description: Delegate a task to Google Gemini through the official Antigravity CLI (`agy`). Main use is saving Claude and Codex usage by handing Gemini clear, simple, well-scoped work (specific coding changes, bulk edits, extraction, summaries, boilerplate). Also use, at lower priority, for a quick second opinion from a different model family and for video or audio understanding (for an audit, or the "review by a different AI model" the core rules offer for risky work, use the model-audit skill), and whenever the user says "ask Gemini", "Antigravity", or "agy". Not for work that needs the calling agent's own MCP connectors, skills, or browser, or that would send patient or client records, or other people's personal data, to Google.
+description: Delegate a task to Google Gemini through the official Antigravity CLI (`agy`). Main use is saving Claude and Codex usage by handing Gemini clear, simple, well-scoped work (specific coding changes, bulk edits, extraction, summaries, boilerplate). Also use, at lower priority, for a quick second opinion from a different model family and for video or audio understanding (for an audit, or the "review by a different AI model" the core rules offer for risky work, use the model-audit skill), and whenever the user says "ask Gemini", "Antigravity", or "agy" for anything but an audit (an audit, even by Gemini alone, uses the model-audit skill). Not for work that needs the calling agent's own MCP connectors, skills, or browser, or that would send patient or client records, or other people's personal data, to Google.
 ---
 
 # Gemini via Antigravity CLI
@@ -10,7 +10,7 @@ Always go through `agy`, Google's own client. Never route Antigravity's login th
 ## When
 
 1. **Main use: save Claude and Codex usage.** When a task is clear and simple to do (a specific code change, a mechanical edit across files, extraction, a summary, a first draft), give it to Gemini and keep the orchestrating agent for planning and checking.
-2. **Lower priority, still use:** a quick second opinion from a different model family, and video or audio understanding. For an audit, use the `model-audit` skill, which runs Gemini through `agy` inside a sandbox where it can run commands.
+2. **Lower priority, still use:** a quick second opinion from a different model family, and video or audio understanding. For an audit, use the `model-audit` skill, which runs Gemini through `agy` inside a sandbox where it can run commands; where that skill cannot run, a read-only review here is the fallback (say Gemini could not run code).
 
 ## Model and effort
 

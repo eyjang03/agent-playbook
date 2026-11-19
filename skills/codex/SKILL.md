@@ -5,7 +5,7 @@ description: Run an OpenAI model through the official Codex CLI as a read-only h
 
 # Codex as a second model
 
-For a full audit (reviewers that run code in a sandbox, several model families, rounds of fixes), use the `model-audit` skill; this skill covers a single read-only question or opinion.
+For a full audit (reviewers that run code in a sandbox, several model families, rounds of fixes), use the `model-audit` skill; this skill covers a single read-only question or opinion, and is the fallback where `model-audit` cannot run (then say the reviewer could not run code).
 
 ## Find the CLI
 
@@ -15,7 +15,7 @@ Use `codex` if it is on `PATH`; otherwise the ChatGPT desktop app bundles it at 
 
 `~/.codex/models_cache.json` lists each model's `slug` and `supported_reasoning_levels`. Match the model the user names (a nickname such as "Astra" maps to a slug such as `gpt-6-astra`) and confirm the effort they ask for is in that model's list. With no model named, use the `model` in `~/.codex/config.toml`. Tell the user the model id and effort the run actually used; the first lines of the run log print both, together with the sandbox.
 
-## Audit with an evidence pack, not access
+## Give it an evidence pack, not access
 
 Codex's read-only sandbox blocks writes and network access, so it can't SSH, sign in, or reach services. Collect what it needs first, in a folder in your scratchpad or temp directory:
 
