@@ -57,7 +57,7 @@ hide:%s
   fi
   # a canary readable by every user, and a localhost listener that logs every connection
   echo "shared canary, not a secret" > "/Users/Shared/$ID.txt"; cat "/Users/Shared/$ID.txt" >/dev/null
-  /usr/bin/python3 -I - "$R/capcheck-listener.log" "$R/capcheck-listener.port" "$LIFE" <<'LISTEN' >/dev/null 2>&1 &
+  /usr/bin/python3 -I -X utf8 - "$R/capcheck-listener.log" "$R/capcheck-listener.port" "$LIFE" <<'LISTEN' >/dev/null 2>&1 &
 import socket, sys, time
 log, portfile = sys.argv[1], sys.argv[2]
 s = socket.socket(socket.AF_INET6); s.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)   # every address, like a real file or screen sharing service
@@ -70,14 +70,14 @@ LISTEN
   LPID=$!; for _ in 1 2 3 4 5 6 7 8 9 10; do [ -s "$R/capcheck-listener.port" ] && break; sleep 0.5; done
   PORT=$(cat "$R/capcheck-listener.port"); nc -z -w 3 127.0.0.1 "$PORT" || { echo "localhost listener not reachable outside the sandbox" >&2; exit 2; }
   # this Mac's own address written as ::ffff:a.b.c.d (round 7 found it slipped past the localhost rule): control from outside
-  MAP=no; OWN=$(/usr/bin/python3 -I -c 'import socket; s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(("192.0.2.1", 9)); print(s.getsockname()[0])' 2>/dev/null || true)
-  if [ -n "$OWN" ] && /usr/bin/python3 -I -c 'import socket,sys; s=socket.socket(socket.AF_INET6); s.settimeout(3); s.connect(("::ffff:"+sys.argv[1], int(sys.argv[2])))' "$OWN" "$PORT" 2>/dev/null; then MAP=yes; fi
+  MAP=no; OWN=$(/usr/bin/python3 -I -X utf8 -c 'import socket; s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.connect(("192.0.2.1", 9)); print(s.getsockname()[0])' 2>/dev/null || true)
+  if [ -n "$OWN" ] && /usr/bin/python3 -I -X utf8 -c 'import socket,sys; s=socket.socket(socket.AF_INET6); s.settimeout(3); s.connect(("::ffff:"+sys.argv[1], int(sys.argv[2])))' "$OWN" "$PORT" 2>/dev/null; then MAP=yes; fi
   for _ in 1 2 3 4 5 6 7 8 9 10; do [ "$(wc -l < "$R/capcheck-listener.log" 2>/dev/null | tr -d ' ')" -ge "$([ $MAP = yes ] && echo 2 || echo 1)" ] && break; sleep 0.3; done   # controls are logged before the log is cleared
   : > "$R/capcheck-listener.log"; [ "$MAP" = yes ] && [ "$LH" = blocked ] && EXPECTED=$((EXPECTED+1))   # the positive control's connection is not counted
   # a process to signal, another app's socket, and the event-tap control (needs the orchestrator app's input permission)
   AUDIT_FIXTURE_MARKER="$ID-env" python3 -I -c "import time; time.sleep($LIFE)" >/dev/null 2>&1 & SLP=$!   # its environment carries a marker
   SOCK="/private/tmp/$ID.sock"
-  /usr/bin/python3 -I - "$SOCK" "$R/capcheck-socket.log" "$LIFE" <<'SOCKET' >/dev/null 2>&1 &
+  /usr/bin/python3 -I -X utf8 - "$SOCK" "$R/capcheck-socket.log" "$LIFE" <<'SOCKET' >/dev/null 2>&1 &
 import os, socket, sys, time
 p, log = sys.argv[1], sys.argv[2]
 s = socket.socket(socket.AF_UNIX); s.bind(p); s.listen(8); s.settimeout(1); end = time.time() + int(sys.argv[3])
@@ -86,7 +86,7 @@ while time.time() < end:
     except socket.timeout: pass
 SOCKET
   SPID=$!; for _ in 1 2 3 4 5 6 7 8 9 10; do [ -S "$SOCK" ] && break; sleep 0.5; done
-  /usr/bin/python3 -I -c 'import socket,sys; s=socket.socket(socket.AF_UNIX); s.connect(sys.argv[1])' "$SOCK" || { echo "socket fixture not reachable outside the sandbox" >&2; exit 2; }
+  /usr/bin/python3 -I -X utf8 -c 'import socket,sys; s=socket.socket(socket.AF_UNIX); s.connect(sys.argv[1])' "$SOCK" || { echo "socket fixture not reachable outside the sandbox" >&2; exit 2; }
   sleep 0.5; : > "$R/capcheck-socket.log"
   [ "$(mdfind -count -onlyin "$HOME/Documents" 'kMDItemContentTypeTree == "public.item"' 2>/dev/null)" -gt 0 ] || { echo "Spotlight returns nothing outside the sandbox" >&2; exit 2; }
   # input monitoring: preflight only (CGPreflightListenEventAccess, IOHIDCheckAccess never show a permission prompt);
@@ -142,7 +142,7 @@ teardown)
   lines() { wc -l < "$1" 2>/dev/null | tr -d ' ' || echo 0; }
   n=$(lines "$R/capcheck-listener.log"); n=${n:-0}; m=$(lines "$R/capcheck-socket.log"); m=${m:-0}
   nc -z -w 3 127.0.0.1 "$(cat "$R/capcheck-listener.port" 2>/dev/null)" >/dev/null 2>&1 || true
-  /usr/bin/python3 -I -c 'import socket,sys; s=socket.socket(socket.AF_UNIX); s.connect(sys.argv[1])' "$SOCKET_PATH" 2>/dev/null || true
+  /usr/bin/python3 -I -X utf8 -c 'import socket,sys; s=socket.socket(socket.AF_UNIX); s.connect(sys.argv[1])' "$SOCKET_PATH" 2>/dev/null || true
   sleep 1.5
   [ "$(lines "$R/capcheck-listener.log")" -gt "$n" ] || { echo "FAIL  the localhost listener was not alive at teardown: inconclusive"; bad=1; }
   [ "$(lines "$R/capcheck-socket.log")" -gt "$m" ] || { echo "FAIL  the app-socket listener was not alive at teardown: inconclusive"; bad=1; }

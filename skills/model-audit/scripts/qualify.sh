@@ -19,13 +19,14 @@ CLIS=(); for c in ${QUALIFY_CLIS:-claude codex agy}; do have "$c" && CLIS+=("$c"
 model() { case $1 in
   claude) echo "${QUALIFY_CLAUDE_MODEL:-haiku}" ;;
   codex)  [ -n "${QUALIFY_CODEX_MODEL:-}" ] && { echo "$QUALIFY_CODEX_MODEL"; return; }
-          /usr/bin/python3 -I -c 'import json,re,sys
+          /usr/bin/python3 -I -X utf8 -c 'import json,re,sys
 d = json.load(open(sys.argv[1])); ms = d.get("models", d) if isinstance(d, dict) else d
 slugs = [m.get("slug") for m in ms if isinstance(m, dict) and m.get("slug")]
 light = [s for s in slugs if re.search(r"luna|mini|nano|lite", s)]
 print((light or slugs or [""])[0])' "${AUDIT_CODEX_HOME:-$HOME/.codex}/models_cache.json" 2>/dev/null ;;
   agy)    [ -n "${QUALIFY_AGY_MODEL:-}" ] && { echo "$QUALIFY_AGY_MODEL"; return; }
-          "${AGY_BIN:-$(command -v agy || echo "$HOME/.local/bin/agy")}" models 2>/dev/null | awk '$1 ~ /-low$/ {print $1; exit}' ;; esac; }
+          "${AGY_BIN:-$(command -v agy || echo "$HOME/.local/bin/agy")}" models 2>/dev/null |   # a Flash model first: a low-effort Neon failed to start in print mode
+            awk '$1 ~ /flash.*-(low|medium)$/ && !f {f=$1} $1 ~ /-low$/ && !l {l=$1} END {print (f ? f : l)}' ;; esac; }
 effort() { case $1 in agy) echo - ;; *) echo low ;; esac; }
 
 A=$(cd "$(mktemp -d /tmp/audit-XXXXXX)" && pwd -P); : > "$A/.audit-folder"

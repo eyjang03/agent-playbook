@@ -22,11 +22,11 @@ UT=$(cd "$(getconf DARWIN_USER_TEMP_DIR)" && pwd -P); UC=$(cd "$(getconf DARWIN_
 real() {   # settings are compared as real paths; a relative or "~" entry would be silently meaningless, so it is refused
   case $1 in /*) ;; *) echo "audit settings need absolute paths: $1" >&2; exit 2 ;; esac
   [ -e "$1" ] || echo "note: an audit setting names a folder that does not exist: $1" >&2
-  /usr/bin/python3 -I -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$1"; }
+  /usr/bin/python3 -I -X utf8 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$1"; }
 # AUDIT_PRIVATE: folders closed from every side, whatever the grant (CLI sign-in homes such as a second account's Codex
 # home, whichever account a run uses). AUDIT_PROTECTED: collections, such as a folder of projects: the folder itself and
 # anything above it cannot be granted, while single projects inside it can.
-PRIVATE=("$(/usr/bin/python3 -I -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$H/.codex")")
+PRIVATE=("$(/usr/bin/python3 -I -X utf8 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$H/.codex")")
 if [ -n "${AUDIT_CODEX_HOME:-}" ]; then r=$(real "$AUDIT_CODEX_HOME") || exit 2; PRIVATE+=("$r"); fi
 IFS=: read -ra EXTRA <<< "${AUDIT_PRIVATE:-}"; for a in "${EXTRA[@]:-}"; do [ -n "$a" ] || continue; r=$(real "$a") || exit 2; PRIVATE+=("$r"); done
 PROTECTED=("$H" /Users /Volumes "$AUD" "$ST" "$UT" "$UC" "$H/Documents" "$H/Desktop" "$H/Downloads")
@@ -135,7 +135,7 @@ for g in "$@"; do
           [ -n "$g" ] && [ -e "$g" ] || continue
           if [ -d "$g" ]; then HIDE+=" (subpath $(q "$g"))"; else HIDE+=" (literal $(q "$g"))"; fi
           if [ -d "$g/objects" ]; then   # alternate object stores, relative to the store that names them, followed through chains
-            alts=$("$PYI_GEN" -I -c 'import os,sys
+            alts=$("$PYI_GEN" -I -X utf8 -c 'import os,sys
 seen, todo, out = set(), [os.path.realpath(sys.argv[1])], []
 while todo:
     o = todo.pop()

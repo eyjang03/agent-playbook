@@ -27,7 +27,7 @@ for d in "$R/pack" "$R/tmp" "$R/pack-master"; do [ ! -L "$d" ] || { echo "refusi
 HERE=$(cd "$(dirname "$0")" && pwd -P)
 case $HERE in "$AUD"|"$AUD"/*) echo "run the launcher from the master tools, not from inside the audit folder" >&2; exit 2 ;; esac
 PYI=/usr/bin/python3                      # trusted interpreter for reading results, always run with -I from $A
-"$PYI" -I -c pass 2>/dev/null || { echo "$PYI is unavailable (install Apple's Command Line Tools)" >&2; exit 2; }
+"$PYI" -I -X utf8 -c pass 2>/dev/null || { echo "$PYI is unavailable (install Apple's Command Line Tools)" >&2; exit 2; }
 TIMEOUT_MIN=${AUDIT_TIMEOUT_MIN:-240}
 case $T in
   claude) BIN=${CLAUDE_BIN:-$(command -v claude || echo "$HOME/.local/bin/claude")}; ST="$HOME/.claude"; ACCT=main ;;
@@ -38,19 +38,19 @@ case $T in
   agy)    BIN=${AGY_BIN:-$(command -v agy || echo "$HOME/.local/bin/agy")}; ST="$HOME/.gemini"; ACCT=main ;;
 esac
 [ -x "$BIN" ] || { echo "CLI not found: $BIN" >&2; exit 2; }
-RBIN=$("$PYI" -I -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$BIN")
+RBIN=$("$PYI" -I -X utf8 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$BIN")
 # grants in canonical form (real paths), so the same input always has the same identity across the round
 CG=(); for g in "$@"; do k=${g%%:*}; v=${g#*:}
   if [ "$k" = runtime ] && [ -e "$v" ]; then   # keep the interpreter's own name: a venv's bin/python is a link to its base
-    CG+=("$k:$("$PYI" -I -c 'import os,sys; print(os.path.join(os.path.realpath(os.path.dirname(sys.argv[1])), os.path.basename(sys.argv[1])))' "$v")")
-  elif [ "$k" != "$g" ] && [ -e "$v" ]; then CG+=("$k:$("$PYI" -I -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$v")"); else CG+=("$g"); fi; done
+    CG+=("$k:$("$PYI" -I -X utf8 -c 'import os,sys; print(os.path.join(os.path.realpath(os.path.dirname(sys.argv[1])), os.path.basename(sys.argv[1])))' "$v")")
+  elif [ "$k" != "$g" ] && [ -e "$v" ]; then CG+=("$k:$("$PYI" -I -X utf8 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$v")"); else CG+=("$g"); fi; done
 [ ${#CG[@]} -gt 0 ] && set -- "${CG[@]}"
 INPUTS_PY="$HERE/inputs.py"; [ -f "$INPUTS_PY" ] || { echo "missing $INPUTS_PY" >&2; exit 2; }
 
 # the first run freezes the prepared pack as pack-master, with a manifest the reviewer cannot write; every attempt
 # starts from pack-master, so a reviewer's edits never carry over, and a pack-master that changed (an edited, added
 # or removed file) is refused: a new revision needs new reviewer folders
-manifest() { local m; m=$("$PYI" -I "$INPUTS_PY" pack "$@") && [ ${#m} -eq 64 ] || { echo "the pack could not be hashed: $1" >&2; exit 2; }; echo "$m"; }   # every entry: type, executable bit, contents
+manifest() { local m; m=$("$PYI" -I -X utf8 "$INPUTS_PY" pack "$@") && [ ${#m} -eq 64 ] || { echo "the pack could not be hashed: $1" >&2; exit 2; }; echo "$m"; }   # every entry: type, executable bit, contents
 if [ -d "$R/pack-master" ]; then
   [ -f "$R/pack-master.sha256" ] && [ "$(manifest "$R/pack-master")" = "$(cat "$R/pack-master.sha256")" ] \
     || { echo "pack-master changed since the first run, or has no manifest: a new revision needs new reviewer folders" >&2; exit 2; }
@@ -84,9 +84,9 @@ fingerprint() {   # $1 input, $2 per-file list to write: one hash, "listing-fail
   case $1 in
     project:*) local p=${1#project:} l; l=$(mktemp "$A/.list.XXXXXX")
       if gitq "$p" ls-files -z --cached --others --exclude-standard > "$l" 2>/dev/null; then
-        "$PYI" -I "$INPUTS_PY" project "$p" "$(gitq "$p" rev-parse HEAD 2>/dev/null || echo none)" "$2" < "$l" 2>/dev/null | awk 'NR==1' || true
+        "$PYI" -I -X utf8 "$INPUTS_PY" project "$p" "$(gitq "$p" rev-parse HEAD 2>/dev/null || echo none)" "$2" < "$l" 2>/dev/null | awk 'NR==1' || true
       else echo listing-failed; fi; rm -f "$l" ;;
-    file:*) "$PYI" -I "$INPUTS_PY" file "${1#file:}" 2>/dev/null || echo incomplete ;;
+    file:*) "$PYI" -I -X utf8 "$INPUTS_PY" file "${1#file:}" 2>/dev/null || echo incomplete ;;
   esac
 }
 roundcheck() {   # $1 name, $2 value: the round's first reviewer records it; every other reviewer must match
@@ -124,10 +124,10 @@ if [ "$T" = claude ]; then
       "$BIN" -p "Reply with OK." --model haiku --safe-mode --strict-mcp-config --no-session-persistence --tools "" --output-format json \
       < /dev/null > "$A/claude-signin.json" 2>&1 ) || true
   rm -rf "${SI:?}"
-  "$PYI" -I -c 'import json,sys; d=json.load(open(sys.argv[1])); sys.exit(0 if d.get("is_error") is False else 1)' "$A/claude-signin.json" 2>/dev/null \
+  "$PYI" -I -X utf8 -c 'import json,sys; d=json.load(open(sys.argv[1])); sys.exit(0 if d.get("is_error") is False else 1)' "$A/claude-signin.json" 2>/dev/null \
     || { echo "rejected=Claude could not sign in even outside the sandbox (see claude-signin.json)" >> "$A/meta.txt"
          echo "$T $M: Claude could not sign in even outside the sandbox; run claude once in a terminal on this Mac to sign in ($A)" >&2; exit 2; }
-  "$PYI" -I - "$A/claude-signin.json" "$TIMEOUT_MIN" >> "$A/meta.txt" 2>/dev/null <<'PY' || true
+  "$PYI" -I -X utf8 - "$A/claude-signin.json" "$TIMEOUT_MIN" >> "$A/meta.txt" 2>/dev/null <<'PY' || true
 import datetime, json, sys
 e = json.load(open(sys.argv[1])).get("credential_expires_at")
 if e:
@@ -167,8 +167,8 @@ helper_ok() { [ -f "$HELPER" ] && [ ! -L "$HELPER" ] && [ "$(stat -f %Lp "$HELPE
 helper_fix() { rm -f "$HELPER"; ( set -C; helper_text "$BIN" > "$HELPER" ); chmod 755 "$HELPER"; }
 # conversations idle for an hour at launch (a concurrent agy session does not count): content hashes, and afterwards
 # the same files hashed again, so any edit, removal or replacement shows (about 6 s each way for 600 MB)
-history_hash() { "$PYI" -I "$INPUTS_PY" history "$ST/antigravity-cli/brain" "$ST/antigravity-cli/conversations" || echo incomplete; }
-history_rehash() { "$PYI" -I "$INPUTS_PY" rehash "$1" || echo incomplete; }
+history_hash() { "$PYI" -I -X utf8 "$INPUTS_PY" history "$ST/antigravity-cli/brain" "$ST/antigravity-cli/conversations" || echo incomplete; }
+history_rehash() { "$PYI" -I -X utf8 "$INPUTS_PY" rehash "$1" || echo incomplete; }
 if [ "$T" = agy ]; then
   mkdir -p "$(dirname "$HELPER")"
   if { [ -e "$HELPER" ] || [ -L "$HELPER" ]; } && ! helper_ok; then cp -P "$HELPER" "$A/agentapi.found-before" 2>/dev/null || true; echo "note=agy shell helper was changed before this run; restored" >> "$A/meta.txt"; fi
@@ -249,7 +249,7 @@ trap - EXIT
 # validate from the attempt folder with an isolated interpreter; nothing from the reviewer's folder is imported,
 # and Codex's message is opened without following links
 cd "$A"
-if "$PYI" -I - "$T" "$rc" "$R/tmp/codex-final-message.md" <<'PY' >> "$A/meta.txt" 2>&1; then
+if "$PYI" -I -X utf8 - "$T" "$rc" "$R/tmp/codex-final-message.md" <<'PY' >> "$A/meta.txt" 2>&1; then
 import json, os, re, signal, stat, sys
 t, rc, codex_msg = sys.argv[1], int(sys.argv[2]), sys.argv[3]
 def fail(msg): print("rejected=" + msg); sys.exit(1)
