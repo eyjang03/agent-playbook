@@ -47,6 +47,10 @@ pref_write() { local o rc; o=$(defaults write "$1" key2 x 2>&1); rc=$?; [ $rc -e
 clip()       { local o rc; o=$(pbpaste 2>&1 >/dev/null); rc=$?; [ $rc -eq 0 ] && return 0   # the clipboard itself is never printed
                [ $rc -eq 1 ] && [ -z "$o" ] && { echo "Operation not permitted: clipboard unavailable"; return 1; }; broken "exit $rc: ${o:0:100}"; }
 sig()  { kill -0 "$1"; }
+# Apple Events: Finder runs whenever the user is logged in (setup confirmed it without sending an event); a real event
+# to it is refused inside the sandbox as -600 (the app cannot be seen), -1743 (not authorized) or -54
+aevent() { local o; o=$(osascript -e 'tell application "Finder" to count windows' 2>&1); [[ $o =~ ^[0-9]+$ ]] && return 0
+           case $o in *"(-600)"*|*"(-1743)"*|*"(-54)"*) echo "Operation not permitted: Apple Event refused (${o##*: })"; return 1 ;; esac; broken "${o:0:100}"; }
 shortcuts_list() { local o rc; o=$(shortcuts list 2>&1 >/dev/null); rc=$?; [ $rc -eq 0 ] && return 0   # names are never printed
                    case $o in *"communicate with a helper application"*) echo "Operation not permitted: Shortcuts unavailable"; return 1 ;; esac; broken "exit $rc: ${o:0:100}"; }
 spot() { local n rc; n=$(mdfind -count -onlyin "$HOME/Documents" 'kMDItemContentTypeTree == "public.item"' 2>&1); rc=$?
@@ -146,7 +150,8 @@ if [ -n "${HIDDEN_FILE:-}" ]; then   # a hide: grant: the path and its project's
   blocked "read a hidden file in a granted project"   cat "$HIDDEN_FILE"
   blocked "read the Git history of that project"      cat "$HIDDEN_PROJECT/.git/HEAD"
 fi
-blocked "send an Apple Event"                       osascript -e 'tell application "System Events" to get name of first process'
+if [ "${FINDER_CONTROL:-no}" = yes ]; then blocked "send an Apple Event" aevent
+else echo "INFO  Apple Event probe skipped: Finder is not running"; fi
 # keychain: setup proved the dummy item's secret can be read outside the sandbox; the secret is never printed
 total=$((total+1))
 kco=$(security find-generic-password -s "$KEYCHAIN_SERVICE" 2>&1 >/dev/null); kcr=$?

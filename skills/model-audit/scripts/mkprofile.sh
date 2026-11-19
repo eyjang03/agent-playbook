@@ -167,7 +167,8 @@ case $T in
     READ+=" (subpath $(q "$H/.local/share/claude")) (literal $(q "$H/.local/bin/claude")) (subpath $(q "$H/Library/Keychains"))" ;;
   codex)
     # the login is read-only: reviewers cannot change the login that ordinary sessions use
-    for f in auth.json auth.json.lock auth.lock installation_id models_cache.json cache tmp log .sandbox_migration .sqlite-maintenance.lock; do SR+=" (subpath $(q "$ST/$f"))"; done
+    # agents/ (custom agent definitions) read-only: Codex 0.169.1 stops at start-up when a present agents folder is unreadable
+    for f in auth.json auth.json.lock auth.lock installation_id models_cache.json cache tmp log .sandbox_migration .sqlite-maintenance.lock agents; do SR+=" (subpath $(q "$ST/$f"))"; done
     for f in auth.json.lock auth.lock installation_id cache tmp log .sqlite-maintenance.lock; do SW+=" (subpath $(q "$ST/$f"))"; done
     DB=" (regex #\"^$(rx "$ST")/(logs|state|queue|goals)_[0-9]+\\.sqlite(-shm|-wal)?\$\")"; SR+="$DB"; SW+="$DB"
     # Codex rewrites models_cache.json at the top of its home through a temporary file and a rename

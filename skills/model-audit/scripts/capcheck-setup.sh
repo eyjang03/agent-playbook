@@ -46,7 +46,7 @@ setup)
   mkdir -p "$R/pack/tools"; cp "$(dirname "$0")/t.tex" "$(dirname "$0")/capcheck.sh" "$R/pack/tools/"
   LH=blocked; [ "$T" = agy ] && LH=gap      # agy runs its own helper server on localhost
   TEC=no; PATH="/opt/homebrew/bin:/usr/local/bin:$PATH" command -v tectonic >/dev/null 2>&1 && TEC=yes   # the LaTeX probe needs Tectonic on this Mac
-  EXPECTED=29; [ -n "$BREW" ] && EXPECTED=$((EXPECTED+1)); [ "$TEC" = yes ] && EXPECTED=$((EXPECTED+1)); [ -n "$PY" ] && EXPECTED=$((EXPECTED+1)); [ -n "$GP" ] && EXPECTED=$((EXPECTED+1)); [ "$LH" = blocked ] && EXPECTED=$((EXPECTED+1))
+  EXPECTED=28; [ -n "$BREW" ] && EXPECTED=$((EXPECTED+1)); [ "$TEC" = yes ] && EXPECTED=$((EXPECTED+1)); [ -n "$PY" ] && EXPECTED=$((EXPECTED+1)); [ -n "$GP" ] && EXPECTED=$((EXPECTED+1)); [ "$LH" = blocked ] && EXPECTED=$((EXPECTED+1))
   if [ -n "$HID" ]; then   # a granted project whose record is hidden: the record and the project's Git metadata must be unreadable
     mkdir "$HID"; echo "hidden record, not a secret" > "$HID/record.txt"
     git -C "$HID" init -q && git -C "$HID" add record.txt && git -C "$HID" -c user.name=audit -c user.email=audit@invalid commit -q -m record
@@ -115,10 +115,11 @@ m=k.IOHIDManagerCreate(None,0); k.IOHIDManagerSetDeviceMatching(m,None); r=k.IOH
     python3 -I -c 'import os,sys; os.close(os.open(sys.argv[1], os.O_RDONLY|os.O_NONBLOCK|os.O_NOCTTY))' "$t" 2>/dev/null && { TTYP=$t; break; }; done
   [ "$TTYP" != none ] && EXPECTED=$((EXPECTED+1))
   SCC=no; shortcuts list >/dev/null 2>&1 && SCC=yes; [ "$SCC" = yes ] && EXPECTED=$((EXPECTED+1))   # Shortcuts works outside the sandbox
+  FIN=no; pgrep -xq Finder && FIN=yes; [ "$FIN" = yes ] && EXPECTED=$((EXPECTED+1))   # the Apple Event target runs (checked without sending one)
   { printf 'KBD_CONTROL=%q\nTTY_PATH=%q\nENV_MARKER=%q\n' "$KBC" "$TTYP" "$ID-env"; printf 'SLEEPER_PID=%q\nSOCKET_PATH=%q\nTAP_CONTROL=%q\nGIT_PROJECT=%q\n' "$SLP" "$SOCK" "$TAPC" "$GP"
     printf 'SHARED_CANARY=%q\nLISTEN_PORT=%q\nLOCALHOST_EXPECT=%q\n' "/Users/Shared/$ID.txt" "$PORT" "$LH"; printf 'PREF_DOMAIN=%q\n' "$ID"; printf 'SIBLING=%q\nROOT=%q\nSTATE_PROBE_DIR=%q\nCONFIG_FILE=%q\nHOOK_FILE=%q\nPRIVATE_FILE=%q\nCANARY=%q\n' \
       "$SIB/pack" "$ROOT" "$SP" "$CF" "$HF" "$PF" "$CAN/canary.txt"
-    printf 'HIDDEN_FILE=%q\nHIDDEN_PROJECT=%q\nSHORTCUTS_CONTROL=%q\nTECTONIC=%q\nMAPPED_CONTROL=%q\nBREW_DIR=%q\n' "${HID:+$HID/record.txt}" "$HID" "$SCC" "$TEC" "$MAP" "$BREW"
+    printf 'HIDDEN_FILE=%q\nHIDDEN_PROJECT=%q\nSHORTCUTS_CONTROL=%q\nTECTONIC=%q\nMAPPED_CONTROL=%q\nBREW_DIR=%q\nFINDER_CONTROL=%q\n' "${HID:+$HID/record.txt}" "$HID" "$SCC" "$TEC" "$MAP" "$BREW" "$FIN"
     printf 'KEYCHAIN_SERVICE=%q\nKEYCHAIN_EXPECT=%q\nKNOWN_SERVICES=%q\nPROBE=%q\nPROJECT_PYTHON=%q\nEXPECTED_CHECKS=%q\n' \
       "$SVC" "$KC" "gh:github.com,Claude Code-credentials" "$ID" "$PY" "$EXPECTED"; } > "$R/pack/tools/capcheck.conf"
   { printf 'ID=%q\nCANARY_DIR=%q\nSERVICE=%q\nLISTENER_PID=%q\nLOCALHOST_EXPECT=%q\nSLEEPER_PID=%q\nSOCKET_PID=%q\nSOCKET_PATH=%q\nPRIVATE_FIXTURE=%q\n' "$ID" "$CAN" "$SVC" "$LPID" "$LH" "$SLP" "$SPID" "$SOCK" "$PF"

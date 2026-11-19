@@ -109,6 +109,19 @@ roundcheck grants "$(printf '%s\n' "${CG[@]:-}" | LC_ALL=C sort)" || echo "inval
 roundcheck pack "$(manifest "$R/pack-master" PROMPT.md context/previous-own-report.md tools/capcheck.conf)" \
   || echo "invalid=this reviewer's shared pack files differ from the round's first reviewer's" >> "$A/meta.txt"
 
+# Codex likewise cannot save a renewed sign-in inside the sandbox (its login is read-only there; seen as "Failed to
+# refresh token ... 401"): renew it first with one tiny request outside the sandbox, from an empty folder, ignoring
+# the user's configuration and rules, in Codex's own read-only sandbox, limited to two minutes.
+if [ "$T" = codex ]; then
+  SI=$(mktemp -d "$AUD/.signin.XXXXXX")
+  ( cd "$SI" && echo "Reply with OK." | env -i HOME="$HOME" USER="$USER" LANG="${LANG:-en_US.UTF-8}" PATH="/usr/bin:/bin" CODEX_HOME="$ST" \
+      /usr/bin/perl -e 'alarm 120; exec @ARGV' "$BIN" exec -m "$M" --ephemeral --ignore-user-config --ignore-rules --skip-git-repo-check \
+      -s read-only -C "$SI" -o "$SI/reply.md" - > "$A/codex-signin.log" 2>&1 ) && [ -s "$SI/reply.md" ] && ok=yes || ok=no
+  rm -rf "${SI:?}"
+  [ "$ok" = yes ] || { echo "rejected=Codex could not sign in even outside the sandbox (see codex-signin.log)" >> "$A/meta.txt"
+    echo "$T $M: Codex could not sign in even outside the sandbox; sign in with CODEX_HOME=$ST codex login ($A)" >&2; exit 2; }
+fi
+
 # inputs that already differ from the round's (or could not be fingerprinted) end the attempt before any CLI starts
 if grep -q '^invalid=' "$A/meta.txt"; then
   echo "rejected=the inputs did not match the round before the start (see invalid=); the CLI was not started" >> "$A/meta.txt"
