@@ -1,9 +1,11 @@
 ---
 name: codex
-description: Run an OpenAI model through the official Codex CLI as a read-only second-model reviewer or helper. Use from Claude Code or another non-Codex agent when the user asks to "run", "ask", or "have Codex/GPT/<model nickname> audit" something, or wants the "review by a different AI model" the core rules offer for risky work. Not for work that needs the calling agent's own connectors, browser, SSH, or accounts, or that would send patient or client records, other people's personal data, or credentials to OpenAI.
+description: Run an OpenAI model through the official Codex CLI as a read-only helper or quick second opinion. Use from Claude Code or another non-Codex agent when the user asks to "run" or "ask" Codex/GPT/<model nickname> something that needs one answer, not an audit. For audits (reviewers that run code, several models, rounds of fixes), including "have Codex audit this" and the "review by a different AI model" the core rules offer for risky work, use the model-audit skill instead. Not for work that needs the calling agent's own connectors, browser, SSH, or accounts, or that would send patient or client records, other people's personal data, or credentials to OpenAI.
 ---
 
 # Codex as a second model
+
+For a full audit (reviewers that run code in a sandbox, several model families, rounds of fixes), use the `model-audit` skill; this skill covers a single read-only question or opinion.
 
 ## Find the CLI
 

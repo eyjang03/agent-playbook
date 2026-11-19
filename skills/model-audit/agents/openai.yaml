@@ -1,0 +1,4 @@
+interface:
+  display_name: "Multi-model audit"
+  short_description: "Audit work with several AI models, each in its own sandbox"
+  default_prompt: "Use $model-audit to have several AI models audit this work, each reviewer running code inside its own macOS sandbox."
